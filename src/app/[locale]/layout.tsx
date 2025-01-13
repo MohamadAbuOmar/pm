@@ -2,10 +2,14 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '../../i18n/routing';
-import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/shared/sidebar';
 import "../globals.css";
 import Header from '@/components/shared/header';
+import dynamic from 'next/dynamic';
+const ClientSidebar = dynamic(() => import('@/components/shared/clientSideBar').then(mod => mod.ClientSidebar), {
+    ssr: false
+});
 
 
 export default async function LocaleLayout({
@@ -33,17 +37,10 @@ export default async function LocaleLayout({
             lang={locale}
             dir={isRTL ? "rtl" : "ltr"}
         >
-
             <body>
-                <NextIntlClientProvider messages={messages}>
-                    <SidebarProvider>
-                        <AppSidebar side={isRTL ? "right" : "left"} />
-                        <SidebarInset>
-                            <Header />
-                            {children}
-                        </SidebarInset>
-                    </SidebarProvider>
-                </NextIntlClientProvider>
+                <ClientSidebar side={isRTL ? "right" : "left"}>
+                    {children}
+                </ClientSidebar>
             </body>
         </html>
     );
