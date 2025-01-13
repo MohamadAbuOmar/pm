@@ -1,0 +1,22 @@
+{
+    "sidebar": {
+        "dashboard": "Dashboard",
+        "fundraising": "Fundraising",
+        "donors": "Donors/ Funders",
+        "calls": "Calls",
+        "proposals": "Proposals",
+        "opportunities": "Opportunities",
+        "projects": "Projects",
+        "myProjects": "My Projects",
+        "activities": "Activities",
+        "procurements": "Procurements",
+        "suppliers": "Suppliers",
+        "tenders": "Tenders",
+        "blackList": "Black List",
+        "committees": "Committees",
+        "mediaReports": "Media Reports",
+        "reports": "Reports",
+        "myFollowUp": "My Follow Up",
+        "myCalender": "My Calender"
+    }
+}
