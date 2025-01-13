@@ -1,4 +1,6 @@
-import { BookCheck, Calendar, ChartSpline, ChevronLeft, ChevronRight, HandCoins, LayoutDashboard, LeafyGreen, Newspaper, ShoppingBasket, Users } from "lucide-react"
+'use client'
+
+import { BookCheck, Calendar, BarChartIcon as ChartSpline, ChevronLeft, ChevronRight, HandCoins, LayoutDashboard, LeafyGreen, Newspaper, ShoppingBasket, Users } from 'lucide-react'
 
 import {
     Sidebar,
@@ -16,10 +18,8 @@ import {
 import { useTranslations } from "next-intl"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible"
 
-
-
-export async function AppSidebar({ side }: { side: "left" | "right" }) {
-    const t = await useTranslations("sidebar")
+export function AppSidebar({ side }: { side: "left" | "right" }) {
+    const t = useTranslations("sidebar")
     const items = [
         {
             title: t("dashboard"),
@@ -180,3 +180,4 @@ export async function AppSidebar({ side }: { side: "left" | "right" }) {
         </Sidebar>
     )
 }
+
