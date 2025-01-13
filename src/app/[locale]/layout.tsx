@@ -2,9 +2,10 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '../../i18n/routing';
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/shared/sidebar';
 import "../globals.css";
+import Header from '@/components/shared/header';
 
 
 export default async function LocaleLayout({
@@ -23,7 +24,7 @@ export default async function LocaleLayout({
     // Providing all messages to the client
     // side is the easiest way to get started
     const messages = await getMessages();
-    
+
     const isRTL = locale === "ar";
 
 
@@ -37,8 +38,10 @@ export default async function LocaleLayout({
                 <NextIntlClientProvider messages={messages}>
                     <SidebarProvider>
                         <AppSidebar side={isRTL ? "right" : "left"} />
-                        <SidebarTrigger />
-                        {children}
+                        <SidebarInset>
+                            <Header />
+                            {children}
+                        </SidebarInset>
                     </SidebarProvider>
                 </NextIntlClientProvider>
             </body>
