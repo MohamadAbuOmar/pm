@@ -70,7 +70,8 @@ export async function middleware(request: NextRequest) {
     });
 
     if (!verifyResponse.ok) {
-      return NextResponse.redirect(new URL('/auth/login', request.url));
+      const locale = request.cookies.get("NEXT_LOCALE")?.value || "en";
+      return NextResponse.redirect(new URL(`/${locale}/auth/login`, request.url));
     }
 
     const { isAdmin } = await verifyResponse.json();
@@ -83,13 +84,30 @@ export async function middleware(request: NextRequest) {
     );
 
     if (isAdminPath && !isAdmin) {
-      return NextResponse.redirect(new URL('/', request.url));
+      const locale = request.cookies.get("NEXT_LOCALE")?.value || "en";
+      return NextResponse.redirect(new URL(`/${locale}`, request.url));
     }
 
     // Apply i18n middleware for non-API routes
     const response = pathname.startsWith('/api/') 
       ? NextResponse.next()
       : intlMiddleware(request);
+
+    // Check if token needs renewal
+    const tokenExp = (verifyResponse as any).exp * 1000;
+    const now = Date.now();
+    const timeUntilExp = tokenExp - now;
+    const TOKEN_RENEWAL_THRESHOLD = 24 * 60 * 60 * 1000; // 1 day in milliseconds
+
+    if (timeUntilExp < TOKEN_RENEWAL_THRESHOLD) {
+      response.cookies.set('auth-token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60,
+        path: '/',
+      });
+    }
 
     return response;
   } catch (err) {

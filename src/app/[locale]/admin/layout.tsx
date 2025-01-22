@@ -1,8 +1,8 @@
+'use client';
+
 import { ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
-'use client';
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -16,9 +16,9 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           </div>
           <div className="space-y-1">
             <Link 
-              href="/admin"
+              href={`/${pathname.split('/')[1]}/admin`}
               className={`block px-4 py-2 rounded-lg transition-colors ${
-                pathname === '/admin' 
+                pathname.endsWith('/admin') 
                   ? 'bg-gray-200 text-gray-900' 
                   : 'hover:bg-gray-100'
               }`}
@@ -26,9 +26,9 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
               Dashboard
             </Link>
             <Link 
-              href="/admin/users"
+              href={`/${pathname.split('/')[1]}/admin/users`}
               className={`block px-4 py-2 rounded-lg transition-colors ${
-                pathname === '/admin/users'
+                pathname.endsWith('/admin/users')
                   ? 'bg-gray-200 text-gray-900'
                   : 'hover:bg-gray-100'
               }`}
@@ -36,9 +36,9 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
               Manage Users
             </Link>
             <Link 
-              href="/admin/roles"
+              href={`/${pathname.split('/')[1]}/admin/roles`}
               className={`block px-4 py-2 rounded-lg transition-colors ${
-                pathname === '/admin/roles'
+                pathname.endsWith('/admin/roles')
                   ? 'bg-gray-200 text-gray-900'
                   : 'hover:bg-gray-100'
               }`}
@@ -46,9 +46,9 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
               Manage Roles
             </Link>
             <Link 
-              href="/admin/permissions"
+              href={`/${pathname.split('/')[1]}/admin/permissions`}
               className={`block px-4 py-2 rounded-lg transition-colors ${
-                pathname === '/admin/permissions'
+                pathname.endsWith('/admin/permissions')
                   ? 'bg-gray-200 text-gray-900'
                   : 'hover:bg-gray-100'
               }`}
