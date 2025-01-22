@@ -1,6 +1,10 @@
 import { getTranslations } from 'next-intl/server';
 
-export async function generateMetadata({ params: { locale } }: { params: { locale: string } }) {
+export async function generateMetadata({
+  params: { locale }
+}: {
+  params: { locale: string }
+}) {
   const t = await getTranslations({ locale, namespace: 'metadata' });
   return {
     title: t('title'),
@@ -8,7 +12,11 @@ export async function generateMetadata({ params: { locale } }: { params: { local
   };
 }
 
-export default async function LoginPage() {
+export default async function LoginPage({
+  params: { locale }
+}: {
+  params: { locale: string }
+}) {
   const t = await getTranslations('forms');
 
   return (
@@ -18,7 +26,7 @@ export default async function LoginPage() {
           <h1 className="text-2xl font-bold">{t('login')}</h1>
           <p className="text-gray-500">{t('login_desc')}</p>
         </div>
-        <LoginForm />
+        <LoginForm locale={locale} />
       </div>
     </div>
   );

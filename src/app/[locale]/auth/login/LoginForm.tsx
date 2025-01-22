@@ -8,7 +8,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-export function LoginForm() {
+interface LoginFormProps {
+  locale: string;
+}
+
+export function LoginForm({ locale }: LoginFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -52,6 +56,7 @@ export function LoginForm() {
         router.push(`/${locale}`);
       }
       router.refresh();
+      router.prefetch(`/${locale}/admin`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
     } finally {
