@@ -1,6 +1,10 @@
 import createIntlMiddleware from "next-intl/middleware";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { verifyToken, generateToken } from '@/lib/auth';
+import type { TokenPayload } from '@/lib/auth';
+
+const TOKEN_RENEWAL_THRESHOLD = 24 * 60 * 60 * 1000; // 1 day in milliseconds
 
 const intlMiddleware = createIntlMiddleware({
   locales: ["en", "ar"],
@@ -94,25 +98,39 @@ export async function middleware(request: NextRequest) {
       : intlMiddleware(request);
 
     // Check if token needs renewal
-    const tokenExp = (verifyResponse as any).exp * 1000;
-    const now = Date.now();
-    const timeUntilExp = tokenExp - now;
-    const TOKEN_RENEWAL_THRESHOLD = 24 * 60 * 60 * 1000; // 1 day in milliseconds
+    try {
+      const payload = verifyToken(token) as TokenPayload;
+      if (!payload.exp) {
+        throw new Error('Token missing expiration');
+      }
+      
+      const tokenExp = payload.exp * 1000;
+      const now = Date.now();
+      const timeUntilExp = tokenExp - now;
 
-    if (timeUntilExp < TOKEN_RENEWAL_THRESHOLD) {
-      response.cookies.set('auth-token', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 7 * 24 * 60 * 60,
-        path: '/',
-      });
+      if (timeUntilExp < TOKEN_RENEWAL_THRESHOLD) {
+        const newToken = generateToken({
+          id: payload.userId,
+          email: payload.email
+        });
+
+        response.cookies.set('auth-token', newToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          maxAge: 7 * 24 * 60 * 60,
+          path: '/',
+        });
+      }
+    } catch (error) {
+      console.error('Token renewal error:', error);
     }
 
     return response;
   } catch (err) {
     console.error('Token validation error:', err);
-    return NextResponse.redirect(new URL('/auth/login', request.url));
+    const locale = request.cookies.get("NEXT_LOCALE")?.value || "en";
+    return NextResponse.redirect(new URL(`/${locale}/auth/login`, request.url));
   }
 }
 
