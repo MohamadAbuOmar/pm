@@ -1,26 +1,28 @@
 'use client';
 
-import * as React from "react";
+import * as React from 'react';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-export function LoginForm() {
+type FormEvent = React.FormEvent<HTMLFormElement>;
+
+export function UserRegistrationForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     setLoading(true);
 
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -31,29 +33,21 @@ export function LoginForm() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Login failed');
+        throw new Error(data.error || 'Registration failed');
       }
 
-      // Check if user is admin
-      const verifyResponse = await fetch('/api/auth/verify');
-      const verifyData = await verifyResponse.json();
-
-      // Redirect based on user role
-      if (verifyData.isAdmin) {
-        router.push('/en/admin');
-      } else {
-        router.push('/en');
-      }
-      router.refresh();
+      setSuccess('User registered successfully');
+      setEmail('');
+      setPassword('');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
+      setError(err instanceof Error ? err.message : 'Registration failed');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 w-full max-w-sm">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
         <Input
@@ -62,7 +56,7 @@ export function LoginForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          placeholder="Enter your email"
+          placeholder="Enter user email"
         />
       </div>
       <div className="space-y-2">
@@ -73,18 +67,21 @@ export function LoginForm() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          placeholder="Enter your password"
+          placeholder="Enter user password"
         />
       </div>
       {error && (
         <div className="text-red-500 text-sm">{error}</div>
+      )}
+      {success && (
+        <div className="text-green-500 text-sm">{success}</div>
       )}
       <Button
         type="submit"
         className="w-full"
         disabled={loading}
       >
-        {loading ? 'Signing in...' : 'Sign in'}
+        {loading ? 'Registering...' : 'Register User'}
       </Button>
     </form>
   );

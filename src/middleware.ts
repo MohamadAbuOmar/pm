@@ -1,13 +1,19 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { verifyToken, generateToken } from '@/lib/auth';
-import { AUTH_CONFIG } from '@/config/auth.config';
+import createIntlMiddleware from "next-intl/middleware";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { verifyToken, generateToken, getUserFromToken } from '@/lib/auth';
+
+const intlMiddleware = createIntlMiddleware({
+  locales: ["en", "ar"],
+  defaultLocale: "en",
+});
 
 const PUBLIC_PATHS = ['/auth/login', '/api/auth/register', '/api/auth/login', '/api/auth/logout'];
+const ADMIN_PATHS = ['/admin'];
 const TOKEN_RENEWAL_THRESHOLD = 24 * 60 * 60; // 1 day in seconds
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const pathname = request.nextUrl.pathname;
   console.log('Middleware processing path:', pathname);
 
   // Skip auth endpoints completely
@@ -16,8 +22,50 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Handle i18n first
+  const pathnameIsMissingLocale = ["en", "ar"].every(
+    (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
+  );
+
+  if (pathnameIsMissingLocale) {
+    const locale = request.cookies.get("NEXT_LOCALE")?.value || "en";
+    return NextResponse.redirect(new URL(`/${locale}${pathname}`, request.url));
+  }
+
+  // Check for admin routes
+  if (ADMIN_PATHS.some(path => pathname.includes(path))) {
+    const token = request.cookies.get('auth-token')?.value;
+    if (!token) {
+      return NextResponse.redirect(new URL('/auth/login', request.url));
+    }
+
+    try {
+      const user = await getUserFromToken(token);
+      if (!user) {
+        return NextResponse.redirect(new URL('/auth/login', request.url));
+      }
+
+      const response = await fetch(new URL('/api/auth/verify', request.url), {
+        headers: {
+          'Cookie': `auth-token=${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        return NextResponse.redirect(new URL('/auth/login', request.url));
+      }
+
+      const { isAdmin } = await response.json();
+      if (!isAdmin) {
+        return NextResponse.redirect(new URL('/', request.url));
+      }
+    } catch (error) {
+      return NextResponse.redirect(new URL('/auth/login', request.url));
+    }
+  }
+
   // Allow public paths
-  if (PUBLIC_PATHS.some(path => pathname.startsWith(path))) {
+  if (PUBLIC_PATHS.some(path => pathname.includes(path))) {
     console.log('Allowing public path:', pathname);
     return NextResponse.next();
   }
@@ -32,44 +80,41 @@ export async function middleware(request: NextRequest) {
   try {
     // Verify token and check expiration
     const payload = verifyToken(token);
-    const response = NextResponse.next();
+    const response = intlMiddleware(request);
 
-    // Check if token needs renewal (less than 1 day until expiration)
-    const tokenExp = (payload as any).exp * 1000; // Convert to milliseconds
+    // Check if token needs renewal
+    const tokenExp = (payload as { exp: number }).exp * 1000;
     const now = Date.now();
     const timeUntilExp = tokenExp - now;
 
     if (timeUntilExp < TOKEN_RENEWAL_THRESHOLD * 1000) {
-      // Generate new token with minimal required fields
       const newToken = generateToken({
         id: payload.userId,
         email: payload.email
       });
 
-      // Set new token in cookie
       response.cookies.set('auth-token', newToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
-        maxAge: 7 * 24 * 60 * 60, // 7 days
+        maxAge: 7 * 24 * 60 * 60,
         path: '/',
       });
     }
 
     return response;
-  } catch (error) {
-    // Invalid token, redirect to login
+  } catch (err) {
+    console.error('Token validation error:', err);
     return NextResponse.redirect(new URL('/auth/login', request.url));
   }
 }
 
 export const config = {
   matcher: [
-    // Match all paths except static files and images
-    '/((?!_next/static|_next/image|favicon.ico|public).*)',
-    // Match API routes that require auth
-    '/api/:path*',
-    // Exclude auth endpoints from matching
-    '/(api/auth.*)',
+    "/((?!api|_next|_vercel|.*\\..*).*)",
+    "/:locale/admin/:path*",
+    "/:locale/admin",
+    "/admin/:path*",
+    "/admin",
   ],
 };
