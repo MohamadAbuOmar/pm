@@ -35,26 +35,42 @@ interface NavItemProps {
 
 function NavItem({ href, icon, children, active }: NavItemProps) {
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Link 
-            href={href}
-            className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-200 ${
-              active 
-                ? 'bg-gray-200 text-gray-900 shadow-sm' 
-                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-            }`}
-          >
-            {icon}
-            <span className="font-medium">{children}</span>
-          </Link>
-        </TooltipTrigger>
-        <TooltipContent side="right">
-          {children}
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <HoverCard>
+      <HoverCardTrigger asChild>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link 
+                href={href}
+                className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-200 group ${
+                  active 
+                    ? 'bg-accent text-accent-foreground shadow-sm' 
+                    : 'text-muted-foreground hover:bg-accent/50 hover:text-accent-foreground'
+                }`}
+              >
+                <span className="flex shrink-0 items-center justify-center">
+                  {icon}
+                </span>
+                <span className="font-medium truncate md:opacity-100 opacity-0 transition-all duration-200 group-hover:opacity-100">
+                  {children}
+                </span>
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="md:hidden">
+              {children}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </HoverCardTrigger>
+      <HoverCardContent side="right" align="start" className="hidden md:block">
+        <div className="space-y-2">
+          <h4 className="text-sm font-semibold">{children}</h4>
+          <p className="text-sm text-muted-foreground">
+            {active ? 'Currently viewing' : 'Click to navigate'}
+          </p>
+        </div>
+      </HoverCardContent>
+    </HoverCard>
   );
 }
 
@@ -105,14 +121,18 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           className="fixed top-4 left-4 z-50 md:hidden"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
-          <Menu className="h-5 w-5" />
+          {isMobileMenuOpen ? (
+            <X className="h-5 w-5" />
+          ) : (
+            <Menu className="h-5 w-5" />
+          )}
         </Button>
 
         {/* Desktop Sidebar */}
-        <aside className="hidden md:flex w-64 flex-col bg-background border-r">
+        <aside className="hidden md:flex w-20 hover:w-64 flex-col bg-background border-r transition-all duration-300 ease-in-out">
           <nav className="flex-1 space-y-1 p-4">
-            <div className="mb-8 flex items-center justify-between">
-              <h2 className="text-xl font-semibold">{t('sidebar.dashboard')}</h2>
+            <div className="mb-8 flex items-center justify-between overflow-hidden">
+              <h2 className="text-xl font-semibold truncate opacity-0 group-hover:opacity-100 transition-opacity duration-200">{t('sidebar.dashboard')}</h2>
             </div>
             <div className="space-y-1">
               {navItems.map((item) => (
