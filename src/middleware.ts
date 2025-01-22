@@ -8,15 +8,17 @@ const TOKEN_RENEWAL_THRESHOLD = 24 * 60 * 60; // 1 day in seconds
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  console.log('Middleware processing path:', pathname);
 
-  // Allow public paths and API routes that don't require auth
-  if (PUBLIC_PATHS.some(path => pathname.startsWith(path)) || 
-      pathname.startsWith('/api/auth/')) {
+  // Skip auth endpoints completely
+  if (pathname.startsWith('/api/auth/')) {
+    console.log('Skipping auth endpoint:', pathname);
     return NextResponse.next();
   }
 
-  // Skip middleware for other API routes
-  if (pathname.startsWith('/api/')) {
+  // Allow public paths
+  if (PUBLIC_PATHS.some(path => pathname.startsWith(path))) {
+    console.log('Allowing public path:', pathname);
     return NextResponse.next();
   }
 
@@ -63,13 +65,11 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
+    // Match all paths except static files and images
     '/((?!_next/static|_next/image|favicon.ico|public).*)',
+    // Match API routes that require auth
+    '/api/:path*',
+    // Exclude auth endpoints from matching
+    '/(api/auth.*)',
   ],
 };

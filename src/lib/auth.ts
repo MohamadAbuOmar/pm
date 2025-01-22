@@ -73,53 +73,79 @@ export async function validateUser(email: string, password: string): Promise<Use
 }
 
 export async function createUser(email: string, password: string, isAdmin: boolean = false): Promise<User> {
-  const hashedPassword = await hashPassword(password);
-  
-  // Create or connect to admin role if this is the first user
-  const roleName = isAdmin ? 'Admin' : AUTH_CONFIG.defaultRole;
-  
-  const user = await prisma.user.create({
-    data: {
-      email,
-      password: hashedPassword,
-      roles: {
-        create: {
-          role: {
-            connectOrCreate: {
-              where: { name: roleName },
-              create: {
-                name: roleName,
-                permissions: isAdmin ? {
-                  create: [
-                    { permission: { create: { name: 'create_user' } } },
-                    { permission: { create: { name: 'manage_roles' } } },
-                    { permission: { create: { name: 'manage_permissions' } } }
-                  ]
-                } : undefined
+  try {
+    console.log('Creating user:', { email, isAdmin });
+    const hashedPassword = await hashPassword(password);
+    
+    // Create or connect to admin role if this is the first user
+    const roleName = isAdmin ? 'Admin' : AUTH_CONFIG.defaultRole;
+    console.log('Using role:', roleName);
+    
+    // Create permissions first if admin
+    if (isAdmin) {
+      console.log('Creating admin permissions...');
+      const permissions = [
+        'create_user',
+        'manage_roles',
+        'manage_permissions'
+      ];
+      
+      for (const permName of permissions) {
+        await prisma.permission.upsert({
+          where: { name: permName },
+          create: { name: permName },
+          update: {}
+        });
+      }
+    }
+    
+    const user = await prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        roles: {
+          create: {
+            role: {
+              connectOrCreate: {
+                where: { name: roleName },
+                create: {
+                  name: roleName,
+                  permissions: isAdmin ? {
+                    create: [
+                      { permission: { connect: { name: 'create_user' } } },
+                      { permission: { connect: { name: 'manage_roles' } } },
+                      { permission: { connect: { name: 'manage_permissions' } } }
+                    ]
+                  } : undefined
+                }
               }
             }
           }
         }
-      }
-    },
-    include: {
-      roles: {
-        include: {
-          role: {
-            include: {
-              permissions: {
-                include: {
-                  permission: true
+      },
+      include: {
+        roles: {
+          include: {
+            role: {
+              include: {
+                permissions: {
+                  include: {
+                    permission: true
+                  }
                 }
               }
             }
           }
         }
       }
-    }
-  });
+    });
 
-  return user;
+    console.log('User created successfully:', { id: user.id, email: user.email });
+    return user;
+  } catch (error) {
+    console.error('Error creating user:', error);
+    throw error;
+  }
 }
 
 export async function getUserPermissions(userId: number): Promise<string[]> {
