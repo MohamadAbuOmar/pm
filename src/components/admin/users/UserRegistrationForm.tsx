@@ -1,74 +1,76 @@
 'use client';
 
 import * as React from 'react';
-import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-
-type FormEvent = React.FormEvent<HTMLFormElement>;
+import { userRegistrationSchema, type UserRegistrationInput } from '@/lib/validations/auth';
 
 export function UserRegistrationForm() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [error, setError] = React.useState('');
+  const [success, setSuccess] = React.useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setSuccess('');
-    setLoading(true);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting }
+  } = useForm<UserRegistrationInput>({
+    resolver: zodResolver(userRegistrationSchema)
+  });
 
+  const onSubmit = async (data: UserRegistrationInput) => {
     try {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(data),
       });
 
-      const data = await response.json();
+      const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Registration failed');
+        throw new Error(result.error || 'Registration failed');
       }
 
       setSuccess('User registered successfully');
-      setEmail('');
-      setPassword('');
+      reset();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed');
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
         <Input
           id="email"
           type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
+          {...register('email')}
           placeholder="Enter user email"
+          aria-invalid={errors.email ? 'true' : 'false'}
         />
+        {errors.email && (
+          <p className="text-sm text-red-500">{errors.email.message}</p>
+        )}
       </div>
       <div className="space-y-2">
         <Label htmlFor="password">Password</Label>
         <Input
           id="password"
           type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
+          {...register('password')}
           placeholder="Enter user password"
+          aria-invalid={errors.password ? 'true' : 'false'}
         />
+        {errors.password && (
+          <p className="text-sm text-red-500">{errors.password.message}</p>
+        )}
       </div>
       {error && (
         <div className="text-red-500 text-sm">{error}</div>
@@ -79,9 +81,9 @@ export function UserRegistrationForm() {
       <Button
         type="submit"
         className="w-full"
-        disabled={loading}
+        disabled={isSubmitting}
       >
-        {loading ? 'Registering...' : 'Register User'}
+        {isSubmitting ? 'Registering...' : 'Register User'}
       </Button>
     </form>
   );

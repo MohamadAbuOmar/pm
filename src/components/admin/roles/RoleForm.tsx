@@ -1,13 +1,14 @@
 'use client';
 
 import * as React from 'react';
-import { useState } from 'react';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-
-type FormEvent = React.FormEvent<HTMLFormElement>;
+import { roleSchema, type RoleInput } from '@/lib/validations/auth';
 
 interface Permission {
   id: number;
@@ -15,70 +16,88 @@ interface Permission {
 }
 
 export function RoleForm() {
-  const [roleName, setRoleName] = useState('');
-  const [permissions, setPermissions] = useState<Permission[]>([]);
-  const [selectedPermissions, setSelectedPermissions] = useState<number[]>([]);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [permissions, setPermissions] = React.useState<Permission[]>([]);
+  const [error, setError] = React.useState('');
+  const [success, setSuccess] = React.useState('');
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    watch,
+    formState: { errors, isSubmitting }
+  } = useForm<RoleInput>({
+    resolver: zodResolver(roleSchema),
+    defaultValues: {
+      name: '',
+      permissions: []
+    }
+  });
+
+  // Watch permissions field for validation
+  const selectedPermissions = watch('permissions');
 
   // Fetch available permissions on component mount
-  const fetchPermissions = async () => {
-    try {
-      const response = await fetch('/api/admin/permissions');
-      if (!response.ok) throw new Error('Failed to fetch permissions');
-      const data = await response.json();
-      setPermissions(data.permissions);
-    } catch (err) {
-      setError('Failed to load permissions');
-    }
-  };
+  useEffect(() => {
+    const fetchPermissions = async () => {
+      try {
+        const response = await fetch('/api/admin/permissions');
+        if (!response.ok) throw new Error('Failed to fetch permissions');
+        const data = await response.json();
+        setPermissions(data.permissions);
+      } catch (err) {
+        setError('Failed to load permissions');
+      }
+    };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setSuccess('');
-    setLoading(true);
+    fetchPermissions();
+  }, []);
 
+  const onSubmit = async (data: RoleInput) => {
     try {
       const response = await fetch('/api/admin/roles', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          name: roleName,
-          permissions: selectedPermissions,
-        }),
+        body: JSON.stringify(data),
       });
 
-      const data = await response.json();
+      const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to create role');
+        throw new Error(result.error || 'Failed to create role');
       }
 
       setSuccess('Role created successfully');
-      setRoleName('');
-      setSelectedPermissions([]);
+      reset();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create role');
-    } finally {
-      setLoading(false);
     }
   };
 
+  const handlePermissionChange = (permissionId: number, checked: boolean) => {
+    const currentPermissions = watch('permissions');
+    const newPermissions = checked
+      ? [...currentPermissions, permissionId]
+      : currentPermissions.filter(id => id !== permissionId);
+    setValue('permissions', newPermissions, { shouldValidate: true });
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="space-y-2">
-        <Label htmlFor="roleName">Role Name</Label>
+        <Label htmlFor="name">Role Name</Label>
         <Input
-          id="roleName"
-          value={roleName}
-          onChange={(e) => setRoleName(e.target.value)}
-          required
+          id="name"
+          {...register('name')}
           placeholder="Enter role name"
+          aria-invalid={errors.name ? 'true' : 'false'}
         />
+        {errors.name && (
+          <p className="text-sm text-red-500">{errors.name.message}</p>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -88,13 +107,9 @@ export function RoleForm() {
             <div key={permission.id} className="flex items-center space-x-2">
               <Checkbox
                 id={`permission-${permission.id}`}
-                checked={selectedPermissions.includes(permission.id)}
+                checked={selectedPermissions?.includes(permission.id)}
                 onCheckedChange={(checked) => {
-                  setSelectedPermissions(prev =>
-                    checked
-                      ? [...prev, permission.id]
-                      : prev.filter(id => id !== permission.id)
-                  );
+                  handlePermissionChange(permission.id, checked as boolean);
                 }}
               />
               <Label htmlFor={`permission-${permission.id}`}>
@@ -103,6 +118,9 @@ export function RoleForm() {
             </div>
           ))}
         </div>
+        {errors.permissions && (
+          <p className="text-sm text-red-500">{errors.permissions.message}</p>
+        )}
       </div>
 
       {error && (
@@ -114,9 +132,9 @@ export function RoleForm() {
       <Button
         type="submit"
         className="w-full"
-        disabled={loading}
+        disabled={isSubmitting}
       >
-        {loading ? 'Creating...' : 'Create Role'}
+        {isSubmitting ? 'Creating...' : 'Create Role'}
       </Button>
     </form>
   );

@@ -1,12 +1,13 @@
 'use client';
 
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
-
-type FormEvent = React.FormEvent<HTMLFormElement>;
+import { roleAssignmentSchema, type RoleAssignmentInput } from '@/lib/validations/auth';
 
 interface Role {
   id: number;
@@ -19,16 +20,21 @@ interface User {
 }
 
 export function AssignRoleForm() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [roles, setRoles] = useState<Role[]>([]);
-  const [selectedUser, setSelectedUser] = useState<number | null>(null);
-  const [selectedRole, setSelectedRole] = useState<number | null>(null);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [users, setUsers] = React.useState<User[]>([]);
+  const [roles, setRoles] = React.useState<Role[]>([]);
+  const [error, setError] = React.useState('');
+  const [success, setSuccess] = React.useState('');
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting }
+  } = useForm<RoleAssignmentInput>({
+    resolver: zodResolver(roleAssignmentSchema)
+  });
 
   useEffect(() => {
-    // Fetch users and roles on component mount
     const fetchData = async () => {
       try {
         const [usersResponse, rolesResponse] = await Promise.all([
@@ -53,53 +59,37 @@ export function AssignRoleForm() {
     fetchData();
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedUser || !selectedRole) {
-      setError('Please select both user and role');
-      return;
-    }
-
-    setError('');
-    setSuccess('');
-    setLoading(true);
-
+  const onSubmit = async (data: RoleAssignmentInput) => {
     try {
       const response = await fetch('/api/admin/users/assign-role', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          userId: selectedUser,
-          roleId: selectedRole
-        }),
+        body: JSON.stringify(data),
       });
 
-      const data = await response.json();
+      const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to assign role');
+        throw new Error(result.error || 'Failed to assign role');
       }
 
       setSuccess('Role assigned successfully');
-      setSelectedUser(null);
-      setSelectedRole(null);
+      reset();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to assign role');
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="space-y-2">
-        <Label htmlFor="user">User</Label>
+        <Label htmlFor="userId">User</Label>
         <Select
-          id="user"
-          value={selectedUser?.toString() || ''}
-          onValueChange={(value) => setSelectedUser(Number(value))}
+          id="userId"
+          {...register('userId', { valueAsNumber: true })}
+          aria-invalid={errors.userId ? 'true' : 'false'}
         >
           <option value="">Select a user</option>
           {users.map((user) => (
@@ -108,14 +98,17 @@ export function AssignRoleForm() {
             </option>
           ))}
         </Select>
+        {errors.userId && (
+          <p className="text-sm text-red-500">{errors.userId.message}</p>
+        )}
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="role">Role</Label>
+        <Label htmlFor="roleId">Role</Label>
         <Select
-          id="role"
-          value={selectedRole?.toString() || ''}
-          onValueChange={(value) => setSelectedRole(Number(value))}
+          id="roleId"
+          {...register('roleId', { valueAsNumber: true })}
+          aria-invalid={errors.roleId ? 'true' : 'false'}
         >
           <option value="">Select a role</option>
           {roles.map((role) => (
@@ -124,6 +117,9 @@ export function AssignRoleForm() {
             </option>
           ))}
         </Select>
+        {errors.roleId && (
+          <p className="text-sm text-red-500">{errors.roleId.message}</p>
+        )}
       </div>
 
       {error && (
@@ -135,9 +131,9 @@ export function AssignRoleForm() {
       <Button
         type="submit"
         className="w-full"
-        disabled={loading}
+        disabled={isSubmitting}
       >
-        {loading ? 'Assigning...' : 'Assign Role'}
+        {isSubmitting ? 'Assigning...' : 'Assign Role'}
       </Button>
     </form>
   );
