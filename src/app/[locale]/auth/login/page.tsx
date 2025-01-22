@@ -1,17 +1,22 @@
-'use client';
+import { getTranslations } from 'next-intl/server';
 
-import { useTranslations } from 'next-intl';
-import { LoginForm } from '@/components/auth/login/LoginForm';
+export async function generateMetadata({ params: { locale } }: { params: { locale: string } }) {
+  const t = await getTranslations({ locale, namespace: 'metadata' });
+  return {
+    title: t('title'),
+    description: t('description')
+  };
+}
 
-export default function LoginPage() {
-  const t = useTranslations();
+export default async function LoginPage() {
+  const t = await getTranslations('forms');
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
       <div className="w-full max-w-sm space-y-4">
         <div className="text-center space-y-2">
-          <h1 className="text-2xl font-bold">{t('forms.login')}</h1>
-          <p className="text-gray-500">{t('forms.login_desc')}</p>
+          <h1 className="text-2xl font-bold">{t('login')}</h1>
+          <p className="text-gray-500">{t('login_desc')}</p>
         </div>
         <LoginForm />
       </div>
