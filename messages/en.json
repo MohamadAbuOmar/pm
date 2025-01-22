@@ -1,0 +1,50 @@
+{
+  "metadata": {
+    "title": "Project Management",
+    "description": "Efficient project management solution"
+  },
+  "forms": {
+    "login": "Welcome back",
+    "login_desc": "Sign in to your account",
+    "email": "Email",
+    "email_placeholder": "Enter your email",
+    "password": "Password",
+    "password_placeholder": "Enter your password",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "loading": "Loading...",
+    "success": "Success",
+    "error": "Error",
+    "register_user": "Register New User",
+    "assign_role": "Assign Role to User",
+    "create_role": "Create New Role",
+    "create_permission": "Create New Permission"
+  },
+  "navbar": {
+    "profile": "Profile",
+    "logout": "Logout",
+    "language": "Language"
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "users": "Manage Users",
+    "users_desc": "Create and manage user accounts",
+    "roles": "Manage Roles",
+    "roles_desc": "Configure user roles and permissions",
+    "permissions": "Manage Permissions",
+    "permissions_desc": "Set up system permissions"
+  },
+  "profile": {
+    "title": "Profile",
+    "roles": "Roles",
+    "permissions": "Permissions"
+  },
+  "errors": {
+    "required": "This field is required",
+    "invalid_email": "Invalid email address",
+    "invalid_password": "Invalid password",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Forbidden"
+  }
+}

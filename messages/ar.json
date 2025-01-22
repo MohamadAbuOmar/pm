@@ -1,0 +1,50 @@
+{
+  "metadata": {
+    "title": "إدارة المشاريع",
+    "description": "حل فعال لإدارة المشاريع"
+  },
+  "forms": {
+    "login": "مرحباً بعودتك",
+    "login_desc": "تسجيل الدخول إلى حسابك",
+    "email": "البريد الإلكتروني",
+    "email_placeholder": "أدخل بريدك الإلكتروني",
+    "password": "كلمة المرور",
+    "password_placeholder": "أدخل كلمة المرور",
+    "submit": "إرسال",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "loading": "جاري التحميل...",
+    "success": "تم بنجاح",
+    "error": "خطأ",
+    "register_user": "تسجيل مستخدم جديد",
+    "assign_role": "تعيين دور للمستخدم",
+    "create_role": "إنشاء دور جديد",
+    "create_permission": "إنشاء صلاحية جديدة"
+  },
+  "navbar": {
+    "profile": "الملف الشخصي",
+    "logout": "تسجيل الخروج",
+    "language": "اللغة"
+  },
+  "sidebar": {
+    "dashboard": "لوحة التحكم",
+    "users": "إدارة المستخدمين",
+    "users_desc": "إنشاء وإدارة حسابات المستخدمين",
+    "roles": "إدارة الأدوار",
+    "roles_desc": "تكوين أدوار وصلاحيات المستخدمين",
+    "permissions": "إدارة الصلاحيات",
+    "permissions_desc": "إعداد صلاحيات النظام"
+  },
+  "profile": {
+    "title": "الملف الشخصي",
+    "roles": "الأدوار",
+    "permissions": "الصلاحيات"
+  },
+  "errors": {
+    "required": "هذا الحقل مطلوب",
+    "invalid_email": "البريد الإلكتروني غير صالح",
+    "invalid_password": "كلمة المرور غير صالحة",
+    "unauthorized": "غير مصرح",
+    "forbidden": "ممنوع"
+  }
+}
