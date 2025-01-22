@@ -78,6 +78,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const locale = pathname.split('/')[1];
+  const t = useTranslations();
 
   const isActive = (path: string) => pathname.endsWith(path);
 
@@ -107,8 +108,6 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       isActive: isActive('/admin/permissions')
     }
   ];
-
-  const t = useTranslations();
 
   return (
     <div className="min-h-screen flex flex-col">
