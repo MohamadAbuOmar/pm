@@ -1,0 +1,35 @@
+{
+  "navbar": {
+    "profile": "الملف الشخصي",
+    "logout": "تسجيل الخروج",
+    "language": "اللغة"
+  },
+  "sidebar": {
+    "dashboard": "لوحة التحكم",
+    "users": "إدارة المستخدمين",
+    "roles": "إدارة الأدوار",
+    "permissions": "إدارة الأذونات"
+  },
+  "forms": {
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "submit": "إرسال",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "loading": "جاري التحميل...",
+    "success": "تم بنجاح",
+    "error": "خطأ"
+  },
+  "profile": {
+    "title": "الملف الشخصي",
+    "roles": "الأدوار",
+    "permissions": "الصلاحيات"
+  },
+  "errors": {
+    "required": "هذا الحقل مطلوب",
+    "invalid_email": "البريد الإلكتروني غير صالح",
+    "invalid_password": "كلمة المرور غير صالحة",
+    "unauthorized": "غير مصرح",
+    "forbidden": "ممنوع"
+  }
+}
