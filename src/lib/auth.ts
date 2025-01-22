@@ -92,13 +92,18 @@ export async function createUser(email: string, password: string, isAdmin: boole
         'manage_permissions'
       ];
       
-      for (const permName of permissions) {
-        await prisma.permission.upsert({
-          where: { name: permName },
-          create: { name: permName },
-          update: {}
-        });
-      }
+      // Create all permissions first
+      const createdPermissions = await Promise.all(
+        permissions.map(permName =>
+          prisma.permission.upsert({
+            where: { name: permName },
+            create: { name: permName },
+            update: {}
+          })
+        )
+      );
+      
+      console.log('Admin permissions created:', createdPermissions.map(p => p.name));
     }
     
     const user = await prisma.user.create({
@@ -112,13 +117,17 @@ export async function createUser(email: string, password: string, isAdmin: boole
                 where: { name: roleName },
                 create: {
                   name: roleName,
-                  permissions: isAdmin ? {
-                    create: [
-                      { permission: { connect: { name: 'create_user' } } },
-                      { permission: { connect: { name: 'manage_roles' } } },
-                      { permission: { connect: { name: 'manage_permissions' } } }
-                    ]
-                  } : undefined
+                  ...(isAdmin && {
+                    permissions: {
+                      createMany: {
+                        data: [
+                          { permissionId: (await prisma.permission.findUnique({ where: { name: 'create_user' } }))!.id },
+                          { permissionId: (await prisma.permission.findUnique({ where: { name: 'manage_roles' } }))!.id },
+                          { permissionId: (await prisma.permission.findUnique({ where: { name: 'manage_permissions' } }))!.id }
+                        ]
+                      }
+                    }
+                  })
                 }
               }
             }
