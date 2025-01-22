@@ -44,3 +44,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# environment variables
+.env
+.env.local
+.env.*.local
+
+# security
+*.pem
+*.key
+*.cert

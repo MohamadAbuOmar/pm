@@ -1,11 +1,11 @@
 import { compare, hash } from 'bcryptjs';
-import { sign, verify } from 'jsonwebtoken';
+import { sign, verify, VerifyOptions, Secret } from 'jsonwebtoken';
 import { AUTH_CONFIG } from '@/config/auth.config';
-import { PrismaClient, User } from '@prisma/client';
+import { Permission, Role, User } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
+import { JwtPayload } from 'jsonwebtoken';
 
-const prisma = new PrismaClient();
-
-export interface TokenPayload {
+export interface TokenPayload extends JwtPayload {
   userId: number;
   email: string;
 }
@@ -19,7 +19,7 @@ export async function comparePasswords(password: string, hashedPassword: string)
 }
 
 export function generateToken(user: User): string {
-  const payload: TokenPayload = {
+  const payload: Omit<TokenPayload, 'iat' | 'exp'> = {
     userId: user.id,
     email: user.email,
   };
@@ -31,7 +31,18 @@ export function generateToken(user: User): string {
 
 export function verifyToken(token: string): TokenPayload {
   try {
-    return verify(token, AUTH_CONFIG.jwtSecret) as TokenPayload;
+    const decoded = verify(token, AUTH_CONFIG.jwtSecret) as unknown;
+    
+    if (
+      !decoded ||
+      typeof decoded === 'string' ||
+      typeof (decoded as any).userId !== 'number' ||
+      typeof (decoded as any).email !== 'string'
+    ) {
+      throw new Error('Invalid token payload');
+    }
+    
+    return decoded as TokenPayload;
   } catch (error) {
     throw new Error('Invalid token');
   }
@@ -61,8 +72,11 @@ export async function validateUser(email: string, password: string): Promise<Use
   return user;
 }
 
-export async function createUser(email: string, password: string): Promise<User> {
+export async function createUser(email: string, password: string, isAdmin: boolean = false): Promise<User> {
   const hashedPassword = await hashPassword(password);
+  
+  // Create or connect to admin role if this is the first user
+  const roleName = isAdmin ? 'Admin' : AUTH_CONFIG.defaultRole;
   
   const user = await prisma.user.create({
     data: {
@@ -72,13 +86,37 @@ export async function createUser(email: string, password: string): Promise<User>
         create: {
           role: {
             connectOrCreate: {
-              where: { name: AUTH_CONFIG.defaultRole },
-              create: { name: AUTH_CONFIG.defaultRole }
+              where: { name: roleName },
+              create: {
+                name: roleName,
+                permissions: isAdmin ? {
+                  create: [
+                    { permission: { create: { name: 'create_user' } } },
+                    { permission: { create: { name: 'manage_roles' } } },
+                    { permission: { create: { name: 'manage_permissions' } } }
+                  ]
+                } : undefined
+              }
             }
           }
         }
       }
     },
+    include: {
+      roles: {
+        include: {
+          role: {
+            include: {
+              permissions: {
+                include: {
+                  permission: true
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   });
 
   return user;
@@ -113,11 +151,11 @@ export async function getUserPermissions(userId: number): Promise<string[]> {
 
   // Get permissions from roles
   const rolePermissions = user.roles.flatMap(ur => 
-    ur.role.permissions.map(rp => rp.permission.name)
+    ur.role.permissions.map((rp: { permission: Permission }) => rp.permission.name)
   );
 
   // Get direct user permissions
-  const directPermissions = user.permissions.map(up => up.permission.name);
+  const directPermissions = user.permissions.map((up: { permission: Permission }) => up.permission.name);
 
   // Combine and remove duplicates
   return [...new Set([...rolePermissions, ...directPermissions])];
