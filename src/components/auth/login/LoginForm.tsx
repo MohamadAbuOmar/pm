@@ -40,9 +40,9 @@ export function LoginForm() {
 
       // Redirect based on user role
       if (verifyData.isAdmin) {
-        router.push('/admin');
+        router.push('/en/admin');
       } else {
-        router.push('/');
+        router.push('/en');
       }
       router.refresh();
     } catch (err) {
