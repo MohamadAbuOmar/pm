@@ -66,14 +66,29 @@ export function UserRegistrationForm() {
     fetchData();
   }, []);
 
+  const handlePermissionChange = (permissionId: string, checked: boolean) => {
+    const currentPermissions = watch('permissions') || [];
+    const newPermissions = checked
+      ? [...currentPermissions, permissionId]
+      : currentPermissions.filter(id => id !== permissionId);
+    setValue('permissions', newPermissions, { shouldValidate: true });
+  };
+
   const onSubmit = async (data: UserRegistrationInput) => {
     try {
+      // Transform form data to match API expectations
+      const formData = {
+        ...data,
+        roleId: parseInt(data.roleId),
+        permissions: (data.permissions || []).map(p => parseInt(p))
+      };
+
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(formData),
       });
 
       const result = await response.json();
@@ -163,8 +178,10 @@ export function UserRegistrationForm() {
             <div key={permission.id} className="flex items-center space-x-2">
               <Checkbox
                 id={`permission-${permission.id}`}
-                {...register('permissions')}
-                value={permission.id.toString()}
+                checked={watch('permissions')?.includes(permission.id.toString())}
+                onCheckedChange={(checked) => {
+                  handlePermissionChange(permission.id.toString(), checked as boolean);
+                }}
               />
               <Label htmlFor={`permission-${permission.id}`}>
                 {permission.name}
