@@ -6,9 +6,23 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { userRegistrationSchema, type UserRegistrationInput } from '@/lib/validations/auth';
 
+interface Role {
+  id: number;
+  name: string;
+}
+
+interface Permission {
+  id: number;
+  name: string;
+}
+
 export function UserRegistrationForm() {
+  const [roles, setRoles] = React.useState<Role[]>([]);
+  const [permissions, setPermissions] = React.useState<Permission[]>([]);
   const [error, setError] = React.useState('');
   const [success, setSuccess] = React.useState('');
 
@@ -16,10 +30,38 @@ export function UserRegistrationForm() {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting }
+    formState: { errors, isSubmitting },
+    setValue,
+    watch
   } = useForm<UserRegistrationInput>({
     resolver: zodResolver(userRegistrationSchema)
   });
+
+  React.useEffect(() => {
+    // Fetch roles and permissions on component mount
+    const fetchData = async () => {
+      try {
+        const [rolesResponse, permissionsResponse] = await Promise.all([
+          fetch('/api/admin/roles'),
+          fetch('/api/admin/permissions')
+        ]);
+
+        if (!rolesResponse.ok || !permissionsResponse.ok) {
+          throw new Error('Failed to fetch data');
+        }
+
+        const rolesData = await rolesResponse.json();
+        const permissionsData = await permissionsResponse.json();
+
+        setRoles(rolesData.roles);
+        setPermissions(permissionsData.permissions);
+      } catch (err) {
+        setError('Failed to load roles and permissions');
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const onSubmit = async (data: UserRegistrationInput) => {
     try {
@@ -72,6 +114,47 @@ export function UserRegistrationForm() {
           <p className="text-sm text-red-500">{errors.password.message}</p>
         )}
       </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="role">Role</Label>
+        <Select
+          id="role"
+          {...register('roleId')}
+          aria-invalid={errors.roleId ? 'true' : 'false'}
+        >
+          <option value="">Select a role</option>
+          {roles.map((role) => (
+            <option key={role.id} value={role.id.toString()}>
+              {role.name}
+            </option>
+          ))}
+        </Select>
+        {errors.roleId && (
+          <p className="text-sm text-red-500">{errors.roleId.message}</p>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <Label>Additional Permissions</Label>
+        <div className="space-y-2">
+          {permissions.map((permission) => (
+            <div key={permission.id} className="flex items-center space-x-2">
+              <Checkbox
+                id={`permission-${permission.id}`}
+                {...register('permissions')}
+                value={permission.id.toString()}
+              />
+              <Label htmlFor={`permission-${permission.id}`}>
+                {permission.name}
+              </Label>
+            </div>
+          ))}
+        </div>
+        {errors.permissions && (
+          <p className="text-sm text-red-500">{errors.permissions.message}</p>
+        )}
+      </div>
+
       {error && (
         <div className="text-red-500 text-sm">{error}</div>
       )}
