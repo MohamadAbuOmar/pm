@@ -9,6 +9,7 @@ const TOKEN_RENEWAL_THRESHOLD = 24 * 60 * 60 * 1000; // 1 day in milliseconds
 const intlMiddleware = createIntlMiddleware({
   locales: ["en", "ar"],
   defaultLocale: "en",
+  localePrefix: "always"
 });
 
 const PUBLIC_PATHS = [
