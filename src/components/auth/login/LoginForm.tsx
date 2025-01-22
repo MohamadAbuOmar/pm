@@ -36,13 +36,18 @@ export function LoginForm() {
 
       // Check if user is admin
       const verifyResponse = await fetch('/api/auth/verify');
+      if (!verifyResponse.ok) {
+        throw new Error('Failed to verify user role');
+      }
+      
       const verifyData = await verifyResponse.json();
+      const locale = document.documentElement.lang || 'en';
 
-      // Redirect based on user role
+      // Redirect based on user role with proper locale
       if (verifyData.isAdmin) {
-        router.push('/en/admin');
+        router.push(`/${locale}/admin/users`);
       } else {
-        router.push('/en');
+        router.push(`/${locale}`);
       }
       router.refresh();
     } catch (err) {
