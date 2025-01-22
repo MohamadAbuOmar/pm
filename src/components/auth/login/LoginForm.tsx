@@ -34,8 +34,16 @@ export function LoginForm() {
         throw new Error(data.error || 'Login failed');
       }
 
-      // Redirect to dashboard on success
-      router.push('/');
+      // Check if user is admin
+      const verifyResponse = await fetch('/api/auth/verify');
+      const verifyData = await verifyResponse.json();
+
+      // Redirect based on user role
+      if (verifyData.isAdmin) {
+        router.push('/admin');
+      } else {
+        router.push('/');
+      }
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
