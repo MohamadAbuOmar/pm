@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateUser, generateToken } from '@/lib/auth';
-import { cookies } from 'next/headers';
-
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();
@@ -17,8 +15,8 @@ export async function POST(request: NextRequest) {
     const token = generateToken(user);
     
     // Set cookie with token
-    const cookieStore = cookies();
-    cookieStore.set('auth-token', token, {
+    const response = NextResponse.json({ success: true });
+    response.cookies.set('auth-token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
@@ -26,7 +24,7 @@ export async function POST(request: NextRequest) {
       path: '/',
     });
 
-    return NextResponse.json({ success: true });
+    return response;
   } catch (error) {
     console.error('Login error:', error);
     return NextResponse.json(
