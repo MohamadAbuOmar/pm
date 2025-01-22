@@ -1,7 +1,7 @@
 import { compare, hash } from 'bcryptjs';
-import { sign, verify, VerifyOptions, Secret } from 'jsonwebtoken';
+import { sign, verify } from 'jsonwebtoken';
 import { AUTH_CONFIG } from '@/config/auth.config';
-import { Permission, Role, User } from '@prisma/client';
+import { Permission, User } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { JwtPayload } from 'jsonwebtoken';
 
@@ -43,7 +43,7 @@ export function verifyToken(token: string): TokenPayload {
     }
     
     return decoded as TokenPayload;
-  } catch (error) {
+  } catch (_error) {
     throw new Error('Invalid token');
   }
 }

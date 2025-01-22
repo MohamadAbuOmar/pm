@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { verifyToken, generateToken } from '@/lib/auth';
-import { AUTH_CONFIG } from '@/config/auth.config';
 
 const PUBLIC_PATHS = ['/auth/login', '/api/auth/register', '/api/auth/login', '/api/auth/logout'];
 const TOKEN_RENEWAL_THRESHOLD = 24 * 60 * 60; // 1 day in seconds
@@ -35,7 +34,7 @@ export async function middleware(request: NextRequest) {
     const response = NextResponse.next();
 
     // Check if token needs renewal (less than 1 day until expiration)
-    const tokenExp = (payload as any).exp * 1000; // Convert to milliseconds
+    const tokenExp = (payload as { exp: number }).exp * 1000; // Convert to milliseconds
     const now = Date.now();
     const timeUntilExp = tokenExp - now;
 
@@ -57,7 +56,8 @@ export async function middleware(request: NextRequest) {
     }
 
     return response;
-  } catch (error) {
+  } catch (err) {
+    console.error('Token validation error:', err);
     // Invalid token, redirect to login
     return NextResponse.redirect(new URL('/auth/login', request.url));
   }
