@@ -36,14 +36,15 @@ export function verifyToken(token: string): TokenPayload {
     if (
       !decoded ||
       typeof decoded === 'string' ||
-      typeof (decoded as any).userId !== 'number' ||
-      typeof (decoded as any).email !== 'string'
+      typeof (decoded as TokenPayload).userId !== 'number' ||
+      typeof (decoded as TokenPayload).email !== 'string'
     ) {
       throw new Error('Invalid token payload');
     }
     
     return decoded as TokenPayload;
-  } catch (_error) {
+  } catch (error) {
+    console.error('Token verification failed:', error);
     throw new Error('Invalid token');
   }
 }
@@ -54,7 +55,8 @@ export async function getUserFromToken(token: string): Promise<User | null> {
     return await prisma.user.findUnique({
       where: { id: payload.userId },
     });
-  } catch (error) {
+  } catch (err) {
+    console.error('Error getting user from token:', err);
     return null;
   }
 }
