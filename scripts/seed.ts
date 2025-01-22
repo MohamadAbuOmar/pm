@@ -1,6 +1,61 @@
-import { prisma } from '../src/lib/prisma';
-import { createUser } from '../src/lib/auth';
-import { User, Role, Permission, UserRole, RolePermission } from '@prisma/client';
+import { PrismaClient, User, Role, Permission, UserRole, RolePermission } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+async function hashPassword(password: string): Promise<string> {
+  const bcrypt = require('bcryptjs');
+  return bcrypt.hash(password, 10);
+}
+
+async function createUser(email: string, password: string, isAdmin: boolean = false): Promise<User> {
+  const hashedPassword = await hashPassword(password);
+  
+  // Create or connect to admin role if this is the first user
+  const roleName = isAdmin ? 'Admin' : 'Employee';
+  
+  const user = await prisma.user.create({
+    data: {
+      email,
+      password: hashedPassword,
+      roles: {
+        create: {
+          role: {
+            connectOrCreate: {
+              where: { name: roleName },
+              create: {
+                name: roleName,
+                permissions: isAdmin ? {
+                  create: [
+                    { permission: { create: { name: 'create_user' } } },
+                    { permission: { create: { name: 'manage_roles' } } },
+                    { permission: { create: { name: 'manage_permissions' } } }
+                  ]
+                } : undefined
+              }
+            }
+          }
+        }
+      }
+    },
+    include: {
+      roles: {
+        include: {
+          role: {
+            include: {
+              permissions: {
+                include: {
+                  permission: true
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  });
+
+  return user;
+}
 
 type UserWithRoles = User & {
   roles: (UserRole & {
