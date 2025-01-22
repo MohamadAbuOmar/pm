@@ -11,10 +11,33 @@ ADMIN_PASS=${TEST_ADMIN_PASS:-"Mohammad44p"}
 USER_EMAIL=${TEST_USER_EMAIL:-"user@example.com"}
 USER_PASS=${TEST_USER_PASS:-"Mohammad44p"}
 
-# Get port from running Next.js server
-PORT=$(lsof -i -P -n | grep LISTEN | grep node | head -n 1 | awk '{print $9}' | cut -d':' -f2)
-if [ -z "$PORT" ]; then
-  PORT=3000
+# Function to wait for Next.js server and get its port
+wait_for_nextjs() {
+  local max_attempts=30
+  local attempt=1
+  local port=""
+
+  echo "Waiting for Next.js server to start..."
+  while [ $attempt -le $max_attempts ]; do
+    port=$(lsof -i -P -n | grep LISTEN | grep node | tail -n 1 | awk '{print $9}' | cut -d':' -f2)
+    if [ ! -z "$port" ]; then
+      echo "Next.js server found on port $port"
+      echo $port
+      return 0
+    fi
+    echo "Attempt $attempt: Server not ready, waiting..."
+    sleep 1
+    attempt=$((attempt + 1))
+  done
+  echo "Failed to detect Next.js server port"
+  return 1
+}
+
+# Get Next.js server port
+PORT=$(wait_for_nextjs)
+if [ $? -ne 0 ]; then
+  echo "Error: Could not detect Next.js server port"
+  exit 1
 fi
 
 echo "Testing middleware functionality on port $PORT..."
