@@ -1,9 +1,7 @@
-const withNextIntl = require('next-intl/plugin')(
-  './i18n.ts'
-);
+const withNextIntl = require('next-intl/plugin')();
 
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+const config = {
   experimental: {
     serverActions: {
       bodySizeLimit: '2mb'
@@ -11,4 +9,4 @@ const nextConfig = {
   }
 };
 
-module.exports = withNextIntl(nextConfig);
+module.exports = withNextIntl(config);
