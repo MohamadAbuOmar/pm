@@ -3,6 +3,7 @@ import type { NextRequest } from 'next/server';
 import { verifyToken, generateToken } from '@/lib/auth';
 
 const PUBLIC_PATHS = ['/auth/login', '/api/auth/register', '/api/auth/login', '/api/auth/logout'];
+const ADMIN_PATHS = ['/admin'];
 const TOKEN_RENEWAL_THRESHOLD = 24 * 60 * 60; // 1 day in seconds
 
 export async function middleware(request: NextRequest) {
@@ -13,6 +14,33 @@ export async function middleware(request: NextRequest) {
   if (pathname.startsWith('/api/auth/')) {
     console.log('Skipping auth endpoint:', pathname);
     return NextResponse.next();
+  }
+
+  // Check for admin routes
+  if (ADMIN_PATHS.some(path => pathname.startsWith(path))) {
+    const token = request.cookies.get('auth-token')?.value;
+    if (!token) {
+      return NextResponse.redirect(new URL('/auth/login', request.url));
+    }
+
+    try {
+      const response = await fetch(new URL('/api/auth/verify', request.url), {
+        headers: {
+          'Cookie': `auth-token=${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        return NextResponse.redirect(new URL('/auth/login', request.url));
+      }
+
+      const { isAdmin } = await response.json();
+      if (!isAdmin) {
+        return NextResponse.redirect(new URL('/', request.url));
+      }
+    } catch (error) {
+      return NextResponse.redirect(new URL('/auth/login', request.url));
+    }
   }
 
   // Allow public paths
