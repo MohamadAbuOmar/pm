@@ -70,8 +70,10 @@ export function Navbar() {
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="cursor-pointer"
-                onClick={() => router.push("/profile")}
-              >
+                onClick={() => {
+                  const locale = document.documentElement.lang || 'en';
+                  router.push(`/${locale}/profile`);
+                }}              >
                 <User className="mr-2 h-4 w-4" />
                 <span>{t("navbar.profile")}</span>
               </DropdownMenuItem>
