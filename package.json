@@ -8,8 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate",
-    "prisma:generate": "prisma generate",
     "db:push": "prisma db push"
+    "prisma:generate": "prisma generate"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
