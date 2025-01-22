@@ -35,8 +35,7 @@ export async function middleware(request: NextRequest) {
       // Generate new token with minimal required fields
       const newToken = generateToken({
         id: payload.userId,
-        email: payload.email,
-        password: '' // Required by type but not used for token generation
+        email: payload.email
       });
 
       // Set new token in cookie
