@@ -3,14 +3,20 @@ import type { NextRequest } from 'next/server';
 import { verifyToken, generateToken } from '@/lib/auth';
 import { AUTH_CONFIG } from '@/config/auth.config';
 
-const PUBLIC_PATHS = ['/auth/login'];
+const PUBLIC_PATHS = ['/auth/login', '/api/auth/register', '/api/auth/login', '/api/auth/logout'];
 const TOKEN_RENEWAL_THRESHOLD = 24 * 60 * 60; // 1 day in seconds
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Allow public paths
-  if (PUBLIC_PATHS.some(path => pathname.startsWith(path))) {
+  // Allow public paths and API routes that don't require auth
+  if (PUBLIC_PATHS.some(path => pathname.startsWith(path)) || 
+      pathname.startsWith('/api/auth/')) {
+    return NextResponse.next();
+  }
+
+  // Skip middleware for other API routes
+  if (pathname.startsWith('/api/')) {
     return NextResponse.next();
   }
 
@@ -35,8 +41,7 @@ export async function middleware(request: NextRequest) {
       // Generate new token with minimal required fields
       const newToken = generateToken({
         id: payload.userId,
-        email: payload.email,
-        password: '' // Required by type but not used for token generation
+        email: payload.email
       });
 
       // Set new token in cookie

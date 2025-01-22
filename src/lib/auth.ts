@@ -18,7 +18,7 @@ export async function comparePasswords(password: string, hashedPassword: string)
   return compare(password, hashedPassword);
 }
 
-export function generateToken(user: User): string {
+export function generateToken(user: Pick<User, 'id' | 'email'>): string {
   const payload: Omit<TokenPayload, 'iat' | 'exp'> = {
     userId: user.id,
     email: user.email,
