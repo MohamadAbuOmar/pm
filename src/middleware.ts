@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { verifyToken } from '@/lib/auth';
+import { verifyToken, generateToken } from '@/lib/auth';
+import { AUTH_CONFIG } from '@/config/auth.config';
 
 const PUBLIC_PATHS = ['/auth/login'];
+const TOKEN_RENEWAL_THRESHOLD = 24 * 60 * 60; // 1 day in seconds
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -20,9 +22,34 @@ export async function middleware(request: NextRequest) {
   }
 
   try {
-    // Verify token
-    verifyToken(token);
-    return NextResponse.next();
+    // Verify token and check expiration
+    const payload = verifyToken(token);
+    const response = NextResponse.next();
+
+    // Check if token needs renewal (less than 1 day until expiration)
+    const tokenExp = (payload as any).exp * 1000; // Convert to milliseconds
+    const now = Date.now();
+    const timeUntilExp = tokenExp - now;
+
+    if (timeUntilExp < TOKEN_RENEWAL_THRESHOLD * 1000) {
+      // Generate new token with minimal required fields
+      const newToken = generateToken({
+        id: payload.userId,
+        email: payload.email,
+        password: '' // Required by type but not used for token generation
+      });
+
+      // Set new token in cookie
+      response.cookies.set('auth-token', newToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60, // 7 days
+        path: '/',
+      });
+    }
+
+    return response;
   } catch (error) {
     // Invalid token, redirect to login
     return NextResponse.redirect(new URL('/auth/login', request.url));
