@@ -19,16 +19,24 @@ fi
 
 echo "Testing middleware functionality on port $PORT..."
 
+# Set locale cookie
+echo "Set-Cookie: NEXT_LOCALE=en; Path=/;" > $COOKIE_JAR
+
 # Test 1: Public routes without token
 echo -e "\n1. Testing public routes without token..."
-curl -v "http://localhost:$PORT/en/auth/login" 2>&1 | grep "< HTTP"
-curl -v "http://localhost:$PORT/api/auth/register" 2>&1 | grep "< HTTP"
+curl -v "http://localhost:$PORT/en/auth/login" \
+  -b $COOKIE_JAR \
+  2>&1 | grep "< HTTP"
+curl -v "http://localhost:$PORT/api/auth/register" \
+  -b $COOKIE_JAR \
+  2>&1 | grep "< HTTP"
 
 # Test 2: Admin login
 echo -e "\n2. Testing admin login..."
 curl -X POST "http://localhost:$PORT/api/auth/login" \
   -H "Content-Type: application/json" \
   -d "{\"email\":\"$ADMIN_EMAIL\",\"password\":\"$ADMIN_PASS\"}" \
+  -b $COOKIE_JAR \
   -c $ADMIN_COOKIE_JAR \
   -v 2>&1 | grep "< HTTP"
 
@@ -37,41 +45,57 @@ echo -e "\n3. Testing regular user login..."
 curl -X POST "http://localhost:$PORT/api/auth/login" \
   -H "Content-Type: application/json" \
   -d "{\"email\":\"$USER_EMAIL\",\"password\":\"$USER_PASS\"}" \
+  -b $COOKIE_JAR \
   -c $USER_COOKIE_JAR \
   -v 2>&1 | grep "< HTTP"
+
+# Merge locale cookie with auth cookies
+cat $COOKIE_JAR >> $ADMIN_COOKIE_JAR
+cat $COOKIE_JAR >> $USER_COOKIE_JAR
 
 # Test 4: Access admin routes with admin token
 echo -e "\n4. Testing admin routes with admin token..."
 curl -v "http://localhost:$PORT/en/admin" \
   -b $ADMIN_COOKIE_JAR \
+  -H "Accept-Language: en" \
   2>&1 | grep "< HTTP"
 curl -v "http://localhost:$PORT/en/admin/users" \
   -b $ADMIN_COOKIE_JAR \
+  -H "Accept-Language: en" \
   2>&1 | grep "< HTTP"
 
 # Test 5: Try accessing admin routes with regular user token
 echo -e "\n5. Testing admin routes with regular user token..."
 curl -v "http://localhost:$PORT/en/admin" \
   -b $USER_COOKIE_JAR \
+  -H "Accept-Language: en" \
   2>&1 | grep "< HTTP"
 curl -v "http://localhost:$PORT/en/admin/users" \
   -b $USER_COOKIE_JAR \
+  -H "Accept-Language: en" \
   2>&1 | grep "< HTTP"
 
 # Test 6: Test i18n routes
 echo -e "\n6. Testing i18n routes..."
 curl -v "http://localhost:$PORT/en/admin" \
   -b $ADMIN_COOKIE_JAR \
+  -H "Accept-Language: en" \
   2>&1 | grep "< HTTP"
 curl -v "http://localhost:$PORT/ar/admin" \
   -b $ADMIN_COOKIE_JAR \
+  -H "Accept-Language: ar" \
   2>&1 | grep "< HTTP"
 
-# Test 7: Test token renewal
-echo -e "\n7. Testing token renewal..."
+# Test 7: Test token renewal and locale handling
+echo -e "\n7. Testing token renewal and locale handling..."
 curl -v "http://localhost:$PORT/en/admin" \
   -b $ADMIN_COOKIE_JAR \
+  -H "Accept-Language: en" \
   2>&1 | grep -E "(< HTTP|Set-Cookie)"
+curl -v "http://localhost:$PORT/admin" \
+  -b $ADMIN_COOKIE_JAR \
+  -H "Accept-Language: en" \
+  2>&1 | grep -E "(< HTTP|Location)"
 
 # Cleanup
 rm -f $COOKIE_JAR $ADMIN_COOKIE_JAR $USER_COOKIE_JAR
