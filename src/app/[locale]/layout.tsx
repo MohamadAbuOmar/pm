@@ -1,5 +1,4 @@
 import { ReactNode } from 'react';
-import { useLocale } from 'next-intl';
 import { ibmPlexSans, ibmPlexSansArabic } from '@/styles/fonts';
 
 interface RootLayoutProps {

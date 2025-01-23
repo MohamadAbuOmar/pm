@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -28,11 +28,7 @@ export function DonorTable() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    fetchDonors();
-  }, [page]);
-
-  async function fetchDonors() {
+  const fetchDonors = useCallback(async () => {
     try {
       setIsLoading(true);
       const res = await fetch(`/api/admin/donors?page=${page}&pageSize=${pageSize}`);
@@ -40,12 +36,16 @@ export function DonorTable() {
       const data = await res.json();
       setDonors(data.donors);
       setTotalCount(data.totalCount);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : 'Failed to fetch donors');
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [page, pageSize]);
+
+  useEffect(() => {
+    void fetchDonors();
+  }, [fetchDonors]);
 
   function handleNextPage() {
     if (page * pageSize < totalCount) {

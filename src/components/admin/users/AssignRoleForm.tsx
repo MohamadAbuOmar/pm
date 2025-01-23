@@ -52,8 +52,8 @@ export function AssignRoleForm() {
 
         setUsers(usersData.users);
         setRoles(rolesData.roles);
-      } catch (err) {
-        setError('Failed to load users and roles');
+      } catch (error: unknown) {
+        setError(error instanceof Error ? error.message : 'Failed to load users and roles');
       } finally {
         setIsLoading(false);
       }
@@ -80,8 +80,8 @@ export function AssignRoleForm() {
 
       setSuccess('Role assigned successfully');
       reset();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to assign role');
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : 'Failed to assign role');
     }
   };
 
