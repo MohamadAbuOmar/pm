@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getUserFromToken } from '@/lib/auth';
+import { getUserFromToken, getUserPermissions } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,15 +15,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
+    // Verify admin has permission to manage roles
+    const userPermissions = await getUserPermissions(admin.id);
+    if (!userPermissions.includes('manage_roles')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
     // Parse request body
-    const { name, permissions } = await request.json();
+    const { name, permissions: rolePermissions } = await request.json();
 
     // Create role with permissions
     const role = await prisma.role.create({
       data: {
         name,
         permissions: {
-          create: permissions.map((permissionId: number) => ({
+          create: rolePermissions.map((permissionId: number) => ({
             permission: {
               connect: { id: permissionId }
             }
@@ -49,8 +55,24 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    // Verify admin token
+    const token = request.cookies.get('auth-token')?.value;
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const admin = await getUserFromToken(token);
+    if (!admin) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+    }
+
+    // Verify admin has permission to manage roles
+    const userPermissions = await getUserPermissions(admin.id);
+    if (!userPermissions.includes('manage_roles')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     const roles = await prisma.role.findMany({
       include: {
         permissions: {

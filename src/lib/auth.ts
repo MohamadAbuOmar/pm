@@ -101,6 +101,57 @@ export async function createUser(email: string, password: string, isAdmin: boole
       }
     }
     
+    // First ensure the role exists with proper permissions
+    const role = await prisma.role.upsert({
+      where: { name: roleName },
+      create: {
+        name: roleName,
+        permissions: isAdmin ? {
+          create: [
+            { permission: { connect: { name: 'create_user' } } },
+            { permission: { connect: { name: 'manage_roles' } } },
+            { permission: { connect: { name: 'manage_permissions' } } }
+          ]
+        } : undefined
+      },
+      update: isAdmin ? {
+        permissions: {
+          upsert: [
+            {
+              where: {
+                roleId_permissionId: {
+                  roleId: -1, // Will be replaced with actual roleId
+                  permissionId: -1 // Will be replaced with actual permissionId
+                }
+              },
+              create: { permission: { connect: { name: 'create_user' } } },
+              update: {}
+            },
+            {
+              where: {
+                roleId_permissionId: {
+                  roleId: -1,
+                  permissionId: -1
+                }
+              },
+              create: { permission: { connect: { name: 'manage_roles' } } },
+              update: {}
+            },
+            {
+              where: {
+                roleId_permissionId: {
+                  roleId: -1,
+                  permissionId: -1
+                }
+              },
+              create: { permission: { connect: { name: 'manage_permissions' } } },
+              update: {}
+            }
+          ]
+        }
+      } : {}
+    });
+
     const user = await prisma.user.create({
       data: {
         email,
@@ -108,18 +159,8 @@ export async function createUser(email: string, password: string, isAdmin: boole
         roles: {
           create: {
             role: {
-              connectOrCreate: {
-                where: { name: roleName },
-                create: {
-                  name: roleName,
-                  permissions: isAdmin ? {
-                    create: [
-                      { permission: { connect: { name: 'create_user' } } },
-                      { permission: { connect: { name: 'manage_roles' } } },
-                      { permission: { connect: { name: 'manage_permissions' } } }
-                    ]
-                  } : undefined
-                }
+              connect: {
+                id: role.id
               }
             }
           }
