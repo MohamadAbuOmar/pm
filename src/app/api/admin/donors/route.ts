@@ -23,13 +23,31 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
+    // Get pagination parameters from query
+    const pageParam = request.nextUrl.searchParams.get('page') ?? '1';
+    const pageSizeParam = request.nextUrl.searchParams.get('pageSize') ?? '10';
+    const page = parseInt(pageParam, 10) || 1;
+    const pageSize = parseInt(pageSizeParam, 10) || 10;
+
+    // Get total count for pagination metadata
+    const totalCount = await prisma.donor.count();
+
+    // Fetch paginated donors
     const donors = await prisma.donor.findMany({
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      orderBy: { id: 'desc' },
       include: {
         category: true
       }
     });
 
-    return NextResponse.json({ donors });
+    return NextResponse.json({
+      donors,
+      totalCount,
+      page,
+      pageSize
+    });
   } catch (error) {
     console.error('Error fetching donors:', error);
     return NextResponse.json(
