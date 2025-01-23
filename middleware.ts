@@ -1,14 +1,12 @@
-import createIntlMiddleware from "next-intl/middleware";
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import { verifyToken, generateToken } from '@/lib/auth';
-import type { TokenPayload } from '@/lib/auth';
+import createMiddleware from 'next-intl/middleware';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { locales, defaultLocale } from '@/i18n.config';
 
-const TOKEN_RENEWAL_THRESHOLD = 24 * 60 * 60 * 1000; // 1 day in milliseconds
-
-const intlMiddleware = createIntlMiddleware({
-  locales: ["en", "ar"],
-  defaultLocale: "en",
+const intlMiddleware = createMiddleware({
+  locales,
+  defaultLocale,
+  localePrefix: 'always'
 });
 
 const PUBLIC_PATHS = [
@@ -21,123 +19,71 @@ const PUBLIC_PATHS = [
 
 const ADMIN_PATHS = [
   '/admin',
-  '/en/admin',
-  '/ar/admin',
   '/api/admin'
 ];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  console.log('Middleware processing path:', pathname);
 
-  // Skip auth API endpoints completely
+  // Skip auth API endpoints
   if (pathname.startsWith('/api/auth/')) {
-    console.log('Skipping auth endpoint:', pathname);
     return NextResponse.next();
   }
 
   // Handle i18n for non-API routes
   if (!pathname.startsWith('/api/')) {
-    const pathnameIsMissingLocale = ["en", "ar"].every(
-      (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
+    const response = intlMiddleware(request);
+
+    // Allow public paths without auth
+    const isPublicPath = PUBLIC_PATHS.some(path => 
+      pathname === path || 
+      locales.some(locale => pathname === `/${locale}${path}`)
     );
 
-    if (pathnameIsMissingLocale) {
-      const locale = request.cookies.get("NEXT_LOCALE")?.value || "en";
-      return NextResponse.redirect(new URL(`/${locale}${pathname}`, request.url));
+    if (isPublicPath) {
+      return response;
     }
-  }
 
-  // Allow public paths without auth
-  const isPublicPath = PUBLIC_PATHS.some(path => 
-    pathname === path || 
-    pathname === `/en${path}` || 
-    pathname === `/ar${path}`
-  );
-
-  if (isPublicPath) {
-    console.log('Allowing public path:', pathname);
-    return NextResponse.next();
-  }
-
-  // Check for auth token
-  const token = request.cookies.get('auth-token')?.value;
-  if (!token) {
-    return NextResponse.redirect(new URL('/auth/login', request.url));
-  }
-
-  try {
-    // Verify token and check admin status
-    const verifyResponse = await fetch(new URL('/api/auth/verify', request.url), {
-      headers: {
-        'Cookie': `auth-token=${token}`
-      }
-    });
-
-    if (!verifyResponse.ok) {
-      const locale = request.cookies.get("NEXT_LOCALE")?.value || "en";
+    // Check for auth token
+    const token = request.cookies.get('auth-token')?.value;
+    if (!token) {
+      const locale = request.cookies.get("NEXT_LOCALE")?.value || defaultLocale;
       return NextResponse.redirect(new URL(`/${locale}/auth/login`, request.url));
     }
 
-    const { isAdmin } = await verifyResponse.json();
-
-    // Check for admin routes
-    const isAdminPath = ADMIN_PATHS.some(path => 
-      pathname.startsWith(path) || 
-      pathname.startsWith(`/en${path}`) || 
-      pathname.startsWith(`/ar${path}`)
-    );
-
-    if (isAdminPath && !isAdmin) {
-      const locale = request.cookies.get("NEXT_LOCALE")?.value || "en";
-      return NextResponse.redirect(new URL(`/${locale}`, request.url));
-    }
-
-    // Apply i18n middleware for non-API routes
-    const response = pathname.startsWith('/api/') 
-      ? NextResponse.next()
-      : intlMiddleware(request);
-
-    // Check if token needs renewal
+    // Verify token through API
     try {
-      const payload = verifyToken(token) as TokenPayload;
-      if (!payload.exp) {
-        throw new Error('Token missing expiration');
-      }
-      
-      const tokenExp = payload.exp * 1000;
-      const now = Date.now();
-      const timeUntilExp = tokenExp - now;
+      const verifyResponse = await fetch(new URL('/api/auth/verify', request.url), {
+        headers: { 'Cookie': `auth-token=${token}` }
+      });
 
-      if (timeUntilExp < TOKEN_RENEWAL_THRESHOLD) {
-        const newToken = generateToken({
-          id: payload.userId,
-          email: payload.email
-        });
-
-        response.cookies.set('auth-token', newToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'lax',
-          maxAge: 7 * 24 * 60 * 60,
-          path: '/',
-        });
+      if (!verifyResponse.ok) {
+        const locale = request.cookies.get("NEXT_LOCALE")?.value || defaultLocale;
+        return NextResponse.redirect(new URL(`/${locale}/auth/login`, request.url));
       }
-    } catch (error) {
-      console.error('Token renewal error:', error);
+
+      const { isAdmin } = await verifyResponse.json();
+
+      // Protect admin routes
+      if (pathname.includes('/admin') && !isAdmin) {
+        const locale = request.cookies.get("NEXT_LOCALE")?.value || defaultLocale;
+        return NextResponse.redirect(new URL(`/${locale}`, request.url));
+      }
+
+      return response;
+    } catch (err) {
+      console.error('Auth verification error:', err);
+      const locale = request.cookies.get("NEXT_LOCALE")?.value || defaultLocale;
+      return NextResponse.redirect(new URL(`/${locale}/auth/login`, request.url));
     }
-
-    return response;
-  } catch (err) {
-    console.error('Token validation error:', err);
-    const locale = request.cookies.get("NEXT_LOCALE")?.value || "en";
-    return NextResponse.redirect(new URL(`/${locale}/auth/login`, request.url));
   }
+
+  return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    "/((?!_next|_vercel|.*\\..*).*)",
-    "/api/:path*"
-  ],
+    '/((?!api|_next|_vercel|.*\\..*).*)',
+    '/api/:path*'
+  ]
 };

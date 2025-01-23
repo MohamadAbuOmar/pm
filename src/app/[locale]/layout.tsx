@@ -1,42 +1,31 @@
-import { ReactNode } from 'react';
-import { notFound } from 'next/navigation';
-import { locales, Locale } from '@/i18n';
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
+import '../globals.css';
 import { ibmPlexSans } from '@/styles/fonts';
 import type { Metadata } from 'next';
-import { PropsWithChildren } from 'react';
+import { Locale, locales } from '@/i18n.config';
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages } from 'next-intl/server';
 
 export const metadata: Metadata = {
   title: 'PM - Project Management',
   description: 'Efficient project management solution',
 };
 
-async function getLocaleMessages(locale: string) {
-  if (!locales.includes(locale as Locale)) {
-    notFound();
-  }
-  try {
-    return await getMessages(locale);
-  } catch {
-    return {};
-  }
-}
-
-interface RootLayoutProps extends PropsWithChildren {
-  params: { locale: string };
+interface Props {
+  children: React.ReactNode;
+  params: { locale: Locale };
 }
 
 export default async function RootLayout({
   children,
-  params: { locale }
-}: RootLayoutProps) {
-  const messages = await getLocaleMessages(locale);
+  params
+}: Props) {
+  const { locale } = params;
+  const messages = await getMessages(locale);
 
   return (
     <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'} suppressHydrationWarning>
-      <body className={ibmPlexSans.variable}>
-        <NextIntlClientProvider locale={locale} messages={messages}>
+      <body className={`${ibmPlexSans.variable} antialiased`}>
+        <NextIntlClientProvider messages={messages} locale={locale} timeZone="Asia/Jerusalem">
           {children}
         </NextIntlClientProvider>
       </body>
@@ -45,5 +34,5 @@ export default async function RootLayout({
 }
 
 export function generateStaticParams() {
-  return locales.map((locale) => ({ locale })) as { locale: Locale }[];
+  return locales.map((locale) => ({ locale }));
 }

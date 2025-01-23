@@ -1,8 +1,13 @@
 import { getTranslations } from 'next-intl/server';
 import { LoginForm } from '@/components/auth/login/LoginForm';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { Locale } from '@/i18n.config';
 
-export default async function LoginPage() {
+export default async function LoginPage({
+  params
+}: {
+  params: { locale: Locale }
+}) {
   const t = await getTranslations('auth.login');
 
   return (
