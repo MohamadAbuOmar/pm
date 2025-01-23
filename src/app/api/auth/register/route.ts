@@ -16,7 +16,9 @@ export async function POST(request: NextRequest) {
     console.log('User count:', userCount);
     
     // Allow first user registration without authentication
-    if (!isFirstUser) {
+    if (isFirstUser) {
+      console.log('Allowing first user registration without authentication');
+    } else {
       // For subsequent users, verify admin authentication
       const token = request.cookies.get('auth-token')?.value;
       if (!token) {
@@ -42,8 +44,6 @@ export async function POST(request: NextRequest) {
           { status: 403 }
         );
       }
-    } else {
-      console.log('Allowing first user registration without authentication');
     }
 
     // Create user
