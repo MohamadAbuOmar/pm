@@ -17,12 +17,12 @@ type Props = {
 };
 
 async function getLocaleMessages(locale: string) {
+  if (!locales.includes(locale as Locale)) {
+    notFound();
+  }
   try {
-    if (!locales.includes(locale as Locale)) {
-      notFound();
-    }
     return await getMessages(locale);
-  } catch (_error) {
+  } catch {
     return {};
   }
 }
