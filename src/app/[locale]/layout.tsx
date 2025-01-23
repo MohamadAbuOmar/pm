@@ -1,27 +1,39 @@
 import { ReactNode } from 'react';
-import { ibmPlexSans, ibmPlexSansArabic } from '@/styles/fonts';
+import { notFound } from 'next/navigation';
+import { locales, Locale } from '@/i18n';
+import { LocaleProvider } from '@/components/providers/LocaleProvider';
+import { getMessages } from 'next-intl/server';
+import type { Metadata } from 'next';
 
-interface RootLayoutProps {
+export const metadata: Metadata = {
+  title: 'PM - Project Management',
+  description: 'Efficient project management solution',
+};
+
+export default async function LocaleLayout({
+  children,
+  params: { locale },
+}: {
   children: ReactNode;
-  params: {
-    locale: string;
-  };
-}
+  params: { locale: string };
+}): Promise<JSX.Element> {
+  if (!locales.includes(locale as Locale)) {
+    notFound();
+  }
 
-export default async function RootLayout({ children, params: { locale } }: RootLayoutProps) {
-  const currentLocale = locale;
-  
+  const messages = await getMessages(locale);
+
   return (
-    <html lang={currentLocale} dir={currentLocale === 'ar' ? 'rtl' : 'ltr'}>
-      <body className={`${ibmPlexSans.variable} ${ibmPlexSansArabic.variable}`}>
-        <div className={`min-h-screen ${currentLocale === 'ar' ? 'font-arabic' : 'font-sans'}`}>
+    <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'} suppressHydrationWarning>
+      <body>
+        <LocaleProvider locale={locale} messages={messages}>
           {children}
-        </div>
+        </LocaleProvider>
       </body>
     </html>
   );
 }
 
 export function generateStaticParams() {
-  return [{ locale: 'en' }, { locale: 'ar' }];
+  return locales.map((locale) => ({ locale })) as { locale: Locale }[];
 }

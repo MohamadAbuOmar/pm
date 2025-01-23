@@ -1,5 +1,9 @@
 {
   "common": {
+    "welcome": {
+      "title": "مرحباً بكم في PM",
+      "subtitle": "إدارة المشاريع بشكل بسيط"
+    },
     "error": {
       "generic": "حدث خطأ",
       "unauthorized": "غير مصرح",
