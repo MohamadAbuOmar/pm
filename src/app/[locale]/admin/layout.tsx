@@ -13,6 +13,7 @@ import {
   HandHeart
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 interface NavItemProps {
   href: string;
@@ -107,6 +108,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         <nav className="p-4 space-y-2 h-full overflow-y-auto">
           <div className="mb-8 flex items-center justify-between">
             <h2 className="text-xl font-semibold">{useTranslations('admin.layout')('title')}</h2>
+            <LanguageSwitcher />
           </div>
           <div className="space-y-1">
             {navItems.map((item) => (
