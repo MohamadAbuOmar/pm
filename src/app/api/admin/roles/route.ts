@@ -15,6 +15,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
+    // Verify admin has permission to manage roles
+    const permissions = await getUserPermissions(admin.id);
+    if (!permissions.includes('manage_roles')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
     // Parse request body
     const { name, permissions } = await request.json();
 
@@ -49,8 +55,24 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    // Verify admin token
+    const token = request.cookies.get('auth-token')?.value;
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const admin = await getUserFromToken(token);
+    if (!admin) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+    }
+
+    // Verify admin has permission to manage roles
+    const permissions = await getUserPermissions(admin.id);
+    if (!permissions.includes('manage_roles')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     const roles = await prisma.role.findMany({
       include: {
         permissions: {

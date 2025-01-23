@@ -39,8 +39,24 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    // Verify admin token
+    const token = request.cookies.get('auth-token')?.value;
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const admin = await getUserFromToken(token);
+    if (!admin) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+    }
+
+    // Verify admin has permission to manage permissions
+    const permissions = await getUserPermissions(admin.id);
+    if (!permissions.includes('manage_permissions')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     const permissions = await prisma.permission.findMany();
     return NextResponse.json({ permissions });
   } catch (error) {

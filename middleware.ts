@@ -22,7 +22,8 @@ const PUBLIC_PATHS = [
 const ADMIN_PATHS = [
   '/admin',
   '/en/admin',
-  '/ar/admin'
+  '/ar/admin',
+  '/api/admin'
 ];
 
 export async function middleware(request: NextRequest) {
