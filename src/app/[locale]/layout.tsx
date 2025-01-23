@@ -5,6 +5,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { ibmPlexSans } from '@/styles/fonts';
 import type { Metadata } from 'next';
+import { PropsWithChildren } from 'react';
 
 export const metadata: Metadata = {
   title: 'PM - Project Management',
@@ -22,13 +23,14 @@ async function getLocaleMessages(locale: string) {
   }
 }
 
+interface RootLayoutProps extends PropsWithChildren {
+  params: { locale: string };
+}
+
 export default async function RootLayout({
   children,
   params: { locale }
-}: {
-  children: ReactNode;
-  params: { locale: string };
-}) {
+}: RootLayoutProps) {
   const messages = await getLocaleMessages(locale);
 
   return (
@@ -40,7 +42,6 @@ export default async function RootLayout({
       </body>
     </html>
   );
-}
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale })) as { locale: Locale }[];
