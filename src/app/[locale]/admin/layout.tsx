@@ -9,7 +9,8 @@ import {
   Shield, 
   Key,
   Menu,
-  X
+  X,
+  HandHeart
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -67,6 +68,12 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       icon: <Key className="w-5 h-5" />,
       label: 'Manage Permissions',
       isActive: isActive('/admin/permissions')
+    },
+    {
+      href: `/${locale}/admin/donors`,
+      icon: <HandHeart className="w-5 h-5" />,
+      label: 'Manage Donors',
+      isActive: isActive('/admin/donors')
     }
   ];
 

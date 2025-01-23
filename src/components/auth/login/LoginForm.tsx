@@ -36,10 +36,10 @@ export function LoginForm() {
         body: JSON.stringify(data),
       });
 
-      const data = await response.json();
+      const responseData = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Login failed');
+        throw new Error(responseData.error || 'Login failed');
       }
 
       // Check if user is admin
