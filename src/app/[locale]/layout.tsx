@@ -22,7 +22,7 @@ async function getLocaleMessages(locale: string) {
       notFound();
     }
     return await getMessages(locale);
-  } catch (error) {
+  } catch (_error) {
     return {};
   }
 }
