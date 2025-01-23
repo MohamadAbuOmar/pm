@@ -11,11 +11,6 @@ export const metadata: Metadata = {
   description: 'Efficient project management solution',
 };
 
-type Props = {
-  children: ReactNode;
-  params: { locale: string };
-};
-
 async function getLocaleMessages(locale: string) {
   if (!locales.includes(locale as Locale)) {
     notFound();
@@ -27,7 +22,13 @@ async function getLocaleMessages(locale: string) {
   }
 }
 
-export default async function RootLayout({ children, params: { locale } }: Props) {
+export default async function RootLayout({
+  children,
+  params: { locale }
+}: {
+  children: ReactNode;
+  params: { locale: string };
+}) {
   const messages = await getLocaleMessages(locale);
 
   return (
