@@ -9,8 +9,15 @@ import {
   Shield, 
   Key,
   Menu,
-  X
+  X,
+  Lock
 } from 'lucide-react';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Button } from '@/components/ui/button';
 
 interface NavItemProps {
@@ -99,17 +106,50 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           <div className="mb-8 flex items-center justify-between">
             <h2 className="text-xl font-semibold">Admin Dashboard</h2>
           </div>
-          <div className="space-y-1">
-            {navItems.map((item) => (
-              <NavItem
-                key={item.href}
-                href={item.href}
-                icon={item.icon}
-                active={item.isActive}
-              >
-                {item.label}
-              </NavItem>
-            ))}
+          <div className="space-y-4">
+            <NavItem
+              href={`/${locale}/admin`}
+              icon={<LayoutDashboard className="w-5 h-5" />}
+              active={isActive('/admin')}
+            >
+              Dashboard
+            </NavItem>
+            
+            <Accordion type="single" collapsible className="border-none">
+              <AccordionItem value="auth" className="border-none">
+                <AccordionTrigger className="py-2 hover:no-underline">
+                  <div className="flex items-center gap-3">
+                    <Lock className="w-5 h-5" />
+                    <span className="font-medium">Authentication</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="space-y-1 pl-8">
+                    <NavItem
+                      href={`/${locale}/admin/users`}
+                      icon={<Users className="w-5 h-5" />}
+                      active={isActive('/admin/users')}
+                    >
+                      Manage Users
+                    </NavItem>
+                    <NavItem
+                      href={`/${locale}/admin/roles`}
+                      icon={<Shield className="w-5 h-5" />}
+                      active={isActive('/admin/roles')}
+                    >
+                      Manage Roles
+                    </NavItem>
+                    <NavItem
+                      href={`/${locale}/admin/permissions`}
+                      icon={<Key className="w-5 h-5" />}
+                      active={isActive('/admin/permissions')}
+                    >
+                      Manage Permissions
+                    </NavItem>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </div>
         </nav>
       </aside>
