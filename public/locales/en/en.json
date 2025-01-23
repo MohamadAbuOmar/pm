@@ -1,0 +1,102 @@
+{
+  "common": {
+    "error": {
+      "generic": "An error occurred",
+      "unauthorized": "Unauthorized",
+      "forbidden": "Forbidden",
+      "invalidToken": "Invalid token",
+      "internalServer": "Internal server error",
+      "failedToFetch": "Failed to fetch data"
+    },
+    "loading": "Loading...",
+    "actions": {
+      "previous": "Previous",
+      "next": "Next",
+      "submit": "Submit",
+      "cancel": "Cancel",
+      "save": "Save",
+      "delete": "Delete",
+      "edit": "Edit"
+    },
+    "pagination": {
+      "page": "Page",
+      "of": "of"
+    },
+    "status": {
+      "partner": "Partner",
+      "nonPartner": "Non-Partner"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Sign in to your account",
+      "email": "Email",
+      "emailPlaceholder": "Enter your email",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "signIn": "Sign in",
+      "signingIn": "Signing in...",
+      "error": {
+        "invalidCredentials": "Invalid email or password",
+        "loginFailed": "Login failed",
+        "verificationFailed": "Failed to verify user role"
+      }
+    },
+    "validation": {
+      "email": {
+        "required": "Email is required",
+        "invalid": "Invalid email address"
+      },
+      "password": {
+        "required": "Password is required",
+        "minLength": "Password must be at least 8 characters",
+        "uppercase": "Password must contain at least one uppercase letter",
+        "lowercase": "Password must contain at least one lowercase letter",
+        "number": "Password must contain at least one number"
+      }
+    }
+  },
+  "admin": {
+    "layout": {
+      "title": "Admin Dashboard",
+      "navigation": {
+        "dashboard": "Dashboard",
+        "users": "Manage Users",
+        "roles": "Manage Roles",
+        "permissions": "Manage Permissions",
+        "donors": "Manage Donors"
+      }
+    },
+    "donors": {
+      "title": "Donor Management",
+      "table": {
+        "id": "ID",
+        "englishName": "English Name",
+        "arabicName": "Arabic Name",
+        "category": "Category",
+        "email": "Email",
+        "phone": "Phone",
+        "partnerStatus": "Partner Status"
+      },
+      "form": {
+        "title": "Add New Donor",
+        "edit": "Edit Donor",
+        "fields": {
+          "englishName": "English Name",
+          "arabicName": "Arabic Name",
+          "category": "Category",
+          "email": "Email",
+          "phone": "Phone",
+          "isPartner": "Is Partner",
+          "fax": "Fax",
+          "address": "Address",
+          "website": "Website",
+          "workField": "Work Field",
+          "gender": "Gender",
+          "notes": "Notes"
+        }
+      }
+    }
+  }
+}
