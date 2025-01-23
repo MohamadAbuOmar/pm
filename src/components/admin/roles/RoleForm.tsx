@@ -47,8 +47,8 @@ export function RoleForm() {
         if (!response.ok) throw new Error('Failed to fetch permissions');
         const data = await response.json();
         setPermissions(data.permissions);
-      } catch (err) {
-        setError('Failed to load permissions');
+      } catch (error: unknown) {
+        setError(error instanceof Error ? error.message : 'Failed to load permissions');
       } finally {
         setIsLoading(false);
       }
@@ -75,8 +75,8 @@ export function RoleForm() {
 
       setSuccess('Role created successfully');
       reset();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create role');
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : 'Failed to create role');
     }
   };
 

@@ -1,5 +1,9 @@
 {
   "common": {
+    "welcome": {
+      "title": "Welcome to PM",
+      "subtitle": "Project Management made simple"
+    },
     "error": {
       "generic": "An error occurred",
       "unauthorized": "Unauthorized",

@@ -1,28 +1,46 @@
 import { ReactNode } from 'react';
-import { useLocale } from 'next-intl';
-import { ibmPlexSans, ibmPlexSansArabic } from '@/styles/fonts';
+import { notFound } from 'next/navigation';
+import { locales, Locale } from '@/i18n';
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages } from 'next-intl/server';
+import { ibmPlexSans } from '@/styles/fonts';
+import type { Metadata } from 'next';
 
-interface RootLayoutProps {
+export const metadata: Metadata = {
+  title: 'PM - Project Management',
+  description: 'Efficient project management solution',
+};
+
+type Props = {
   children: ReactNode;
-  params: {
-    locale: string;
-  };
+  params: { locale: string };
+};
+
+async function getLocaleMessages(locale: string) {
+  try {
+    if (!locales.includes(locale as Locale)) {
+      notFound();
+    }
+    return await getMessages(locale);
+  } catch (_error) {
+    return {};
+  }
 }
 
-export default async function RootLayout({ children, params: { locale } }: RootLayoutProps) {
-  const currentLocale = locale;
-  
+export default async function RootLayout({ children, params: { locale } }: Props) {
+  const messages = await getLocaleMessages(locale);
+
   return (
-    <html lang={currentLocale} dir={currentLocale === 'ar' ? 'rtl' : 'ltr'}>
-      <body className={`${ibmPlexSans.variable} ${ibmPlexSansArabic.variable}`}>
-        <div className={`min-h-screen ${currentLocale === 'ar' ? 'font-arabic' : 'font-sans'}`}>
+    <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'} suppressHydrationWarning>
+      <body className={ibmPlexSans.variable}>
+        <NextIntlClientProvider locale={locale} messages={messages}>
           {children}
-        </div>
+        </NextIntlClientProvider>
       </body>
     </html>
   );
 }
 
 export function generateStaticParams() {
-  return [{ locale: 'en' }, { locale: 'ar' }];
+  return locales.map((locale) => ({ locale })) as { locale: Locale }[];
 }

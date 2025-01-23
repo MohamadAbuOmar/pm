@@ -56,8 +56,8 @@ export function UserRegistrationForm() {
 
         setRoles(rolesData.roles);
         setPermissions(permissionsData.permissions);
-      } catch (err) {
-        setError('Failed to load roles and permissions');
+      } catch (error: unknown) {
+        setError(error instanceof Error ? error.message : 'Failed to load roles and permissions');
       } finally {
         setIsLoading(false);
       }
@@ -99,8 +99,8 @@ export function UserRegistrationForm() {
 
       setSuccess('User registered successfully');
       reset();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed');
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : 'Registration failed');
     }
   };
 

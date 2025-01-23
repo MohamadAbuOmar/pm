@@ -18,7 +18,6 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: ['var(--font-sans)', 'system-ui'],
-        arabic: ['var(--font-arabic)', 'system-ui'],
       },
       colors: {
         border: "hsl(var(--border))",
