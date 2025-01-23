@@ -13,6 +13,7 @@ import {
   HandHeart
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 interface NavItemProps {
   href: string;
@@ -44,35 +45,37 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
   const isActive = (path: string) => pathname.endsWith(path);
 
+  const t = useTranslations('admin.layout.navigation');
+  
   const navItems = [
     {
       href: `/${locale}/admin`,
       icon: <LayoutDashboard className="w-5 h-5" />,
-      label: 'Dashboard',
+      label: t('dashboard'),
       isActive: isActive('/admin')
     },
     {
       href: `/${locale}/admin/users`,
       icon: <Users className="w-5 h-5" />,
-      label: 'Manage Users',
+      label: t('users'),
       isActive: isActive('/admin/users')
     },
     {
       href: `/${locale}/admin/roles`,
       icon: <Shield className="w-5 h-5" />,
-      label: 'Manage Roles',
+      label: t('roles'),
       isActive: isActive('/admin/roles')
     },
     {
       href: `/${locale}/admin/permissions`,
       icon: <Key className="w-5 h-5" />,
-      label: 'Manage Permissions',
+      label: t('permissions'),
       isActive: isActive('/admin/permissions')
     },
     {
       href: `/${locale}/admin/donors`,
       icon: <HandHeart className="w-5 h-5" />,
-      label: 'Manage Donors',
+      label: t('donors'),
       isActive: isActive('/admin/donors')
     }
   ];
@@ -104,7 +107,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       >
         <nav className="p-4 space-y-2 h-full overflow-y-auto">
           <div className="mb-8 flex items-center justify-between">
-            <h2 className="text-xl font-semibold">Admin Dashboard</h2>
+            <h2 className="text-xl font-semibold">{useTranslations('admin.layout')('title')}</h2>
+            <LanguageSwitcher />
           </div>
           <div className="space-y-1">
             {navItems.map((item) => (

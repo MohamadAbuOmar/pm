@@ -1,0 +1,102 @@
+{
+  "common": {
+    "error": {
+      "generic": "حدث خطأ",
+      "unauthorized": "غير مصرح",
+      "forbidden": "محظور",
+      "invalidToken": "رمز غير صالح",
+      "internalServer": "خطأ في الخادم",
+      "failedToFetch": "فشل في جلب البيانات"
+    },
+    "loading": "جاري التحميل...",
+    "actions": {
+      "previous": "السابق",
+      "next": "التالي",
+      "submit": "إرسال",
+      "cancel": "إلغاء",
+      "save": "حفظ",
+      "delete": "حذف",
+      "edit": "تعديل"
+    },
+    "pagination": {
+      "page": "صفحة",
+      "of": "من"
+    },
+    "status": {
+      "partner": "شريك",
+      "nonPartner": "غير شريك"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "مرحباً بعودتك",
+      "subtitle": "تسجيل الدخول إلى حسابك",
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "أدخل بريدك الإلكتروني",
+      "password": "كلمة المرور",
+      "passwordPlaceholder": "أدخل كلمة المرور",
+      "signIn": "تسجيل الدخول",
+      "signingIn": "جاري تسجيل الدخول...",
+      "error": {
+        "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+        "loginFailed": "فشل تسجيل الدخول",
+        "verificationFailed": "فشل التحقق من صلاحيات المستخدم"
+      }
+    },
+    "validation": {
+      "email": {
+        "required": "البريد الإلكتروني مطلوب",
+        "invalid": "البريد الإلكتروني غير صالح"
+      },
+      "password": {
+        "required": "كلمة المرور مطلوبة",
+        "minLength": "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل",
+        "uppercase": "يجب أن تحتوي كلمة المرور على حرف كبير واحد على الأقل",
+        "lowercase": "يجب أن تحتوي كلمة المرور على حرف صغير واحد على الأقل",
+        "number": "يجب أن تحتوي كلمة المرور على رقم واحد على الأقل"
+      }
+    }
+  },
+  "admin": {
+    "layout": {
+      "title": "لوحة التحكم",
+      "navigation": {
+        "dashboard": "الرئيسية",
+        "users": "إدارة المستخدمين",
+        "roles": "إدارة الأدوار",
+        "permissions": "إدارة الصلاحيات",
+        "donors": "إدارة المتبرعين"
+      }
+    },
+    "donors": {
+      "title": "إدارة المتبرعين",
+      "table": {
+        "id": "الرقم",
+        "englishName": "الاسم بالإنجليزية",
+        "arabicName": "الاسم بالعربية",
+        "category": "الفئة",
+        "email": "البريد الإلكتروني",
+        "phone": "الهاتف",
+        "partnerStatus": "حالة الشراكة"
+      },
+      "form": {
+        "title": "إضافة متبرع جديد",
+        "edit": "تعديل متبرع",
+        "fields": {
+          "englishName": "الاسم بالإنجليزية",
+          "arabicName": "الاسم بالعربية",
+          "category": "الفئة",
+          "email": "البريد الإلكتروني",
+          "phone": "الهاتف",
+          "isPartner": "شريك",
+          "fax": "الفاكس",
+          "address": "العنوان",
+          "website": "الموقع الإلكتروني",
+          "workField": "مجال العمل",
+          "gender": "الجنس",
+          "notes": "ملاحظات"
+        }
+      }
+    }
+  }
+}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
@@ -18,6 +19,8 @@ interface Donor {
 }
 
 export function DonorTable() {
+  const t = useTranslations('admin.donors.table');
+  const ct = useTranslations('common');
   const [donors, setDonors] = useState<Donor[]>([]);
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
@@ -80,13 +83,13 @@ export function DonorTable() {
         <table className="w-full">
           <thead>
             <tr className="border-b bg-gray-50">
-              <th className="p-3 text-left font-medium">ID</th>
-              <th className="p-3 text-left font-medium">English Name</th>
-              <th className="p-3 text-left font-medium">Arabic Name</th>
-              <th className="p-3 text-left font-medium">Category</th>
-              <th className="p-3 text-left font-medium">Email</th>
-              <th className="p-3 text-left font-medium">Phone</th>
-              <th className="p-3 text-left font-medium">Partner Status</th>
+              <th className="p-3 text-left font-medium">{t('id')}</th>
+              <th className="p-3 text-left font-medium">{t('englishName')}</th>
+              <th className="p-3 text-left font-medium">{t('arabicName')}</th>
+              <th className="p-3 text-left font-medium">{t('category')}</th>
+              <th className="p-3 text-left font-medium">{t('email')}</th>
+              <th className="p-3 text-left font-medium">{t('phone')}</th>
+              <th className="p-3 text-left font-medium">{t('partnerStatus')}</th>
             </tr>
           </thead>
           <tbody>
@@ -108,11 +111,11 @@ export function DonorTable() {
                 <td className="p-3">
                   {donor.isPartner ? (
                     <span className="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
-                      Partner
+                      {ct('status.partner')}
                     </span>
                   ) : (
                     <span className="inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">
-                      Non-Partner
+                      {ct('status.nonPartner')}
                     </span>
                   )}
                 </td>
@@ -127,17 +130,17 @@ export function DonorTable() {
           onClick={handlePrevPage} 
           disabled={page <= 1}
         >
-          Previous
+          {ct('actions.previous')}
         </Button>
         <div className="text-sm text-gray-600">
-          Page {page} of {Math.ceil(totalCount / pageSize)}
+          {ct('pagination.page')} {page} {ct('pagination.of')} {Math.ceil(totalCount / pageSize)}
         </div>
         <Button 
           variant="outline" 
           onClick={handleNextPage} 
           disabled={page * pageSize >= totalCount}
         >
-          Next
+          {ct('actions.next')}
         </Button>
       </div>
     </div>
