@@ -9,8 +9,8 @@ interface RootLayoutProps {
   };
 }
 
-export default function RootLayout({ children, params: { locale } }: RootLayoutProps) {
-  const currentLocale = useLocale();
+export default async function RootLayout({ children, params: { locale } }: RootLayoutProps) {
+  const currentLocale = locale;
   
   return (
     <html lang={currentLocale} dir={currentLocale === 'ar' ? 'rtl' : 'ltr'}>

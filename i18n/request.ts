@@ -8,9 +8,10 @@ export default getRequestConfig(async ({ locale }) => {
  
   return {
     locale,
-    messages: {
-      ...(await import(`../public/locales/${locale}/translations.json`)).default
-    },
-    timeZone: 'Asia/Jerusalem'
+    messages: (await import(`../src/messages/${locale}.json`)).default,
+    timeZone: 'Asia/Jerusalem',
+    defaultTranslationValues: {
+      strong: (chunks) => chunks
+    }
   };
 });
