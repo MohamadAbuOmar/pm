@@ -42,6 +42,7 @@ export default async function RootLayout({
       </body>
     </html>
   );
+}
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale })) as { locale: Locale }[];
