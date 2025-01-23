@@ -53,8 +53,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Verify admin has permission to manage permissions
-    const permissions = await getUserPermissions(admin.id);
-    if (!permissions.includes('manage_permissions')) {
+    const userPermissions = await getUserPermissions(admin.id);
+    if (!userPermissions.includes('manage_permissions')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
     const permissions = await prisma.permission.findMany();
