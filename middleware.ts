@@ -5,7 +5,15 @@ import { verifyToken, generateToken } from '@/lib/auth';
 import type { TokenPayload } from '@/lib/auth';
 
 const locales = ['en', 'ar'];
-const publicPaths = ['/auth/login', '/api/auth'];
+const publicPaths = [
+  '/auth/login',
+  '/en/auth/login',
+  '/ar/auth/login',
+  '/api/auth/login',
+  '/api/auth/register',
+  '/api/auth/logout',
+  '/api/auth/verify'
+];
 
 // Create i18n middleware
 const i18nMiddleware = createMiddleware({
@@ -19,7 +27,9 @@ async function withAuth(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
   // Skip auth for public paths
-  if (publicPaths.some(path => pathname.startsWith(path))) {
+  const isPublicPath = publicPaths.some(path => pathname === path || pathname.startsWith('/api/auth/'));
+  if (isPublicPath) {
+    console.log('Skipping auth check for public path:', pathname);
     return NextResponse.next();
   }
 
@@ -83,7 +93,14 @@ async function withAuth(request: NextRequest) {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Skip i18n for API routes
+  // Skip auth for public paths and API auth routes
+  const isPublicPath = publicPaths.includes(pathname) || pathname.startsWith('/api/auth/');
+  if (isPublicPath) {
+    console.log('Skipping auth check for:', pathname);
+    return NextResponse.next();
+  }
+  
+  // Skip i18n for other API routes
   if (pathname.startsWith('/api/')) {
     return withAuth(request);
   }

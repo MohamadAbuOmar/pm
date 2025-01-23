@@ -6,16 +6,22 @@ export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();
 
+    // Verify database connection
+    await prisma.$connect();
+
     // Check if this is the first user (admin)
     const userCount = await prisma.user.count();
     const isFirstUser = userCount === 0;
 
-    // For subsequent users, check admin authentication
+    console.log('User count:', userCount);
+    
+    // Allow first user registration without authentication
     if (!isFirstUser) {
+      // For subsequent users, verify admin authentication
       const token = request.cookies.get('auth-token')?.value;
       if (!token) {
         return NextResponse.json(
-          { error: 'Unauthorized' },
+          { error: 'Unauthorized - Admin token required' },
           { status: 401 }
         );
       }
@@ -23,28 +29,34 @@ export async function POST(request: NextRequest) {
       const admin = await getUserFromToken(token);
       if (!admin) {
         return NextResponse.json(
-          { error: 'Unauthorized' },
+          { error: 'Invalid admin token' },
           { status: 401 }
         );
       }
 
-      // Check if user has admin permissions
+      // Verify admin has create_user permission
       const permissions = await getUserPermissions(admin.id);
       if (!permissions.includes('create_user')) {
         return NextResponse.json(
-          { error: 'Forbidden' },
+          { error: 'Insufficient permissions' },
           { status: 403 }
         );
       }
+    } else {
+      console.log('Allowing first user registration without authentication');
     }
 
-    // Create user with admin role if it's the first user
+    // Create user
+    console.log('Creating user with admin role:', isFirstUser);
     const user = await createUser(email, password, isFirstUser);
     
-    // Generate token for first user
-    const token = generateToken(user);
+    // Generate authentication token
+    const token = generateToken({
+      id: user.id,
+      email: user.email
+    });
     
-    // Create response with user data
+    // Create success response
     const response = NextResponse.json({ 
       success: true,
       user: {
@@ -54,7 +66,7 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    // Always set auth token cookie for the newly created user
+    // Set authentication cookie
     response.cookies.set('auth-token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -65,29 +77,48 @@ export async function POST(request: NextRequest) {
     
     return response;
   } catch (error) {
-    console.error('Registration error details:', {
-      error,
-      message: error instanceof Error ? error.message : 'Unknown error',
+    console.error('Registration error:', {
+      type: error instanceof Error ? error.constructor.name : typeof error,
+      message: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined
     });
-    
-    // Check for specific error types
+
+    // Handle specific error cases
     if (error instanceof Error) {
+      // Database connection error
+      if (error.message.includes('connect')) {
+        return NextResponse.json(
+          { error: 'Database connection failed' },
+          { status: 500 }
+        );
+      }
+
+      // Email uniqueness violation
       if (error.message.includes('Unique constraint')) {
         return NextResponse.json(
           { error: 'Email already exists' },
           { status: 409 }
         );
       }
-      
-      if (error.message.includes('prisma')) {
+
+      // Invalid input data
+      if (error.message.includes('validation failed')) {
+        return NextResponse.json(
+          { error: 'Invalid input data' },
+          { status: 400 }
+        );
+      }
+
+      // Database-related errors
+      if (error.message.includes('prisma') || error.message.includes('database')) {
         return NextResponse.json(
           { error: 'Database error occurred' },
           { status: 500 }
         );
       }
     }
-    
+
+    // Generic error response
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

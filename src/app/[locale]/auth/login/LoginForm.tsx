@@ -8,13 +8,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-export function LoginForm() {
+interface LoginFormProps {
+  locale: string;
+}
+
+export function LoginForm({ locale }: LoginFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const t = useTranslations();
+  const t = useTranslations('forms');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,7 +47,7 @@ export function LoginForm() {
       }
       
       const verifyData = await verifyResponse.json();
-      const locale = document.documentElement.lang || 'en';
+      // Use passed locale prop instead of document.lang
 
       // Redirect based on user role with proper locale
       if (verifyData.isAdmin) {
@@ -62,25 +66,25 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-6 w-full max-w-sm">
       <div className="space-y-2">
-        <Label htmlFor="email">{t('forms.email')}</Label>
+        <Label htmlFor="email">{t('email')}</Label>
         <Input
           id="email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          placeholder={t('forms.email_placeholder')}
+          placeholder={t('email_placeholder')}
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="password">{t('forms.password')}</Label>
+        <Label htmlFor="password">{t('password')}</Label>
         <Input
           id="password"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          placeholder={t('forms.password_placeholder')}
+          placeholder={t('password_placeholder')}
         />
       </div>
       {error && (
@@ -91,7 +95,7 @@ export function LoginForm() {
         className="w-full"
         disabled={loading}
       >
-        {loading ? t('forms.loading') : t('forms.submit')}
+        {loading ? t('loading') : t('submit')}
       </Button>
     </form>
   );

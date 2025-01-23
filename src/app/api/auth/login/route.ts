@@ -12,7 +12,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const token = generateToken(user);
+    const token = generateToken({
+      id: user.id,
+      email: user.email
+    });
     
     // Set cookie with token
     const response = NextResponse.json({ success: true });
