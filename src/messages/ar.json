@@ -69,7 +69,81 @@
         "users": "إدارة المستخدمين",
         "roles": "إدارة الأدوار",
         "permissions": "إدارة الصلاحيات",
-        "donors": "إدارة المتبرعين"
+        "donors": "إدارة المتبرعين",
+        "regions": "إدارة المناطق",
+        "calls": "إدارة المكالمات"
+      }
+    },
+    "regions": {
+      "title": "إدارة المناطق",
+      "addNew": "إضافة منطقة جديدة",
+      "addNewRegion": "إضافة منطقة جديدة",
+      "editRegion": "تعديل المنطقة",
+      "confirmDelete": "هل أنت متأكد من حذف هذه المنطقة؟",
+      "table": {
+        "id": "الرقم",
+        "name": "الاسم",
+        "createdAt": "تاريخ الإنشاء",
+        "actions": "الإجراءات"
+      },
+      "form": {
+        "fields": {
+          "name": "اسم المنطقة"
+        },
+        "placeholders": {
+          "name": "أدخل اسم المنطقة"
+        },
+        "saving": "جاري الحفظ...",
+        "update": "تحديث المنطقة",
+        "create": "إنشاء منطقة"
+      }
+    },
+    "calls": {
+      "title": "إدارة المكالمات",
+      "addNew": "إضافة مكالمة جديدة",
+      "addNewCall": "إضافة مكالمة جديدة",
+      "editCall": "تعديل المكالمة",
+      "confirmDelete": "هل أنت متأكد من حذف هذه المكالمة؟",
+      "table": {
+        "id": "الرقم",
+        "name": "الاسم",
+        "focalPoint": "نقطة الاتصال",
+        "budget": "الميزانية",
+        "currency": "العملة",
+        "donorContribution": "مساهمة المانح",
+        "uawcContribution": "مساهمة UAWC",
+        "startDate": "تاريخ البدء",
+        "endDate": "تاريخ الانتهاء",
+        "donor": "المانح",
+        "createdBy": "أنشئ بواسطة",
+        "actions": "الإجراءات"
+      },
+      "form": {
+        "fields": {
+          "name": "اسم المكالمة",
+          "focalPoint": "نقطة الاتصال",
+          "budget": "الميزانية",
+          "currency": "العملة",
+          "donorContribution": "مساهمة المانح",
+          "uawcContribution": "مساهمة UAWC",
+          "startDate": "تاريخ البدء",
+          "endDate": "تاريخ الانتهاء",
+          "donor": "المانح"
+        },
+        "placeholders": {
+          "name": "أدخل اسم المكالمة",
+          "focalPoint": "أدخل اسم نقطة الاتصال",
+          "budget": "أدخل مبلغ الميزانية",
+          "currency": "اختر العملة",
+          "donorContribution": "أدخل مساهمة المانح",
+          "uawcContribution": "أدخل مساهمة UAWC",
+          "startDate": "اختر تاريخ البدء",
+          "endDate": "اختر تاريخ الانتهاء",
+          "donor": "اختر المانح"
+        },
+        "saving": "جاري الحفظ...",
+        "update": "تحديث المكالمة",
+        "create": "إنشاء مكالمة"
       }
     },
     "donors": {

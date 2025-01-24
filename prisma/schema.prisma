@@ -14,7 +14,6 @@ datasource db {
 }
 
 model User {
-
   id          Int              @id @default(autoincrement())
   email       String           @unique
   password    String
@@ -22,7 +21,7 @@ model User {
   permissions UserPermission[]
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
-
+  calls       Call[]
 }
 
 model Role {
@@ -102,13 +101,48 @@ model Donor {
   updatedAt   DateTime     @updatedAt @map("updated_at")
   
   category    DonorCategory? @relation(fields: [categoryId], references: [id])
+  region      Region?        @relation("RegionToDonors", fields: [regionId], references: [id])
+  calls       Call[]
 
   @@map("donors")
   @@index([categoryId])
+  @@index([regionId])
 }
 
 enum Gender {
   male
   female
   other
+}
+
+model Region {
+  id        Int      @id @default(autoincrement()) @map("regions_id")
+  name      String   @db.Text @map("regions_name")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  donors    Donor[]  @relation("RegionToDonors")
+
+  @@map("regions")
+}
+
+model Call {
+  id                Int       @id @default(autoincrement()) @map("call_id")
+  name              String    @db.Text @map("call_name")
+  focalPoint        String?   @db.Text @map("call_focal_point")
+  budget            String?   @db.Text @map("call_budjet")
+  currency          String    @db.Text @map("call_currency")
+  donorContribution String?   @db.Text @map("doner_contribution")
+  uawcContribution  String?   @db.Text @map("uawc_contribution")
+  startDate         DateTime? @map("start_date")
+  endDate           DateTime? @map("end_date")
+  insertDate        DateTime  @default(now()) @map("insert_date")
+  insertUserId      Int       @map("insert_user_id")
+  donorsId          Int       @map("donors_id")
+  
+  donor    Donor @relation(fields: [donorsId], references: [id])
+  user     User  @relation(fields: [insertUserId], references: [id])
+
+  @@map("calls")
+  @@index([donorsId])
+  @@index([insertUserId])
 }

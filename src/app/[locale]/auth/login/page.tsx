@@ -2,11 +2,15 @@ import { getTranslations } from 'next-intl/server';
 import { LoginForm } from '@/components/auth/login/LoginForm';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
-export default async function LoginPage() {
+export default async function LoginPage({
+  params: { locale }
+}: {
+  params: { locale: string }
+}) {
   const t = await getTranslations('auth.login');
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
+    <div className="flex min-h-screen items-center justify-center p-4" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
       <div className="absolute top-4 right-4">
         <LanguageSwitcher />
       </div>
