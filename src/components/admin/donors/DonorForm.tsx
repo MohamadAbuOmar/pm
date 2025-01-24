@@ -11,6 +11,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select } from '@/components/ui/select';
 import { donorSchema, type DonorInput } from '@/lib/validations/donor';
 import { cn } from '@/lib/utils';
+import { CategoryModal } from './CategoryModal';
 
 interface DonorFormProps {
   donor?: {
@@ -86,10 +87,14 @@ export function DonorForm({ donor, onSuccess }: DonorFormProps) {
     const fetchRegions = async () => {
       try {
         const res = await fetch('/api/admin/regions');
-        if (!res.ok) throw new Error('Failed to fetch regions');
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.error || 'Failed to fetch regions');
+        }
         const data = await res.json();
         setRegions(data.regions);
       } catch (err) {
+        console.error('Error fetching regions:', err);
         setError(err instanceof Error ? err.message : 'Failed to fetch regions');
       }
     };
@@ -129,7 +134,7 @@ export function DonorForm({ donor, onSuccess }: DonorFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 relative">
       {error && (
         <Alert variant="destructive">
           <AlertDescription>{error}</AlertDescription>
@@ -166,10 +171,28 @@ export function DonorForm({ donor, onSuccess }: DonorFormProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="categoryId">{t('fields.category')}</Label>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="categoryId">{t('fields.category')}</Label>
+            <CategoryModal onSuccess={() => {
+              // Refetch categories when a new one is created
+              const fetchCategories = async () => {
+                try {
+                  const res = await fetch('/api/admin/donors/categories');
+                  if (!res.ok) throw new Error(ct('error.failedToFetch'));
+                  const data = await res.json();
+                  setCategories(data.categories);
+                } catch (err) {
+                  setError(err instanceof Error ? err.message : ct('error.failedToFetch'));
+                }
+              };
+              void fetchCategories();
+            }} />
+          </div>
           <Select
             id="categoryId"
-            {...register('categoryId', { valueAsNumber: true })}
+            {...register('categoryId', { 
+              setValueAs: (value: string) => value === "" ? undefined : parseInt(value, 10)
+            })}
             className={cn(isRTL && "text-right font-arabic")}
           >
             <option value="">{t('placeholders.category')}</option>
@@ -188,7 +211,9 @@ export function DonorForm({ donor, onSuccess }: DonorFormProps) {
           <Label htmlFor="regionId">{t('fields.region')}</Label>
           <Select
             id="regionId"
-            {...register('regionId', { valueAsNumber: true })}
+            {...register('regionId', { 
+              setValueAs: (value: string) => value === "" ? undefined : parseInt(value, 10)
+            })}
             className={cn(isRTL && "text-right font-arabic")}
           >
             <option value="">{t('placeholders.region')}</option>
@@ -292,8 +317,11 @@ export function DonorForm({ donor, onSuccess }: DonorFormProps) {
           <Label htmlFor="gender">{t('fields.gender')}</Label>
           <Select
             id="gender"
-            {...register('gender')}
+            {...register('gender', {
+              setValueAs: (value: string) => value || null
+            })}
             className={cn(isRTL && "text-right font-arabic")}
+            defaultValue=""
           >
             <option value="">{t('placeholders.gender')}</option>
             <option value="male">{t('gender.male')}</option>
@@ -310,8 +338,11 @@ export function DonorForm({ donor, onSuccess }: DonorFormProps) {
         <Label htmlFor="isPartner">{t('fields.isPartner')}</Label>
         <Select
           id="isPartner"
-          {...register('isPartner', { valueAsNumber: true })}
+          {...register('isPartner', {
+            setValueAs: (value: string) => parseInt(value, 10)
+          })}
           className={cn(isRTL && "text-right font-arabic")}
+          defaultValue="0"
         >
           <option value="0">{t('partnerStatus.no')}</option>
           <option value="1">{t('partnerStatus.yes')}</option>
@@ -339,7 +370,13 @@ export function DonorForm({ donor, onSuccess }: DonorFormProps) {
 
       <Button
         type="submit"
-        className="w-full"
+        className={cn(
+          "w-full relative",
+          "transition-colors hover:bg-primary/90",
+          "focus:ring-2 focus:ring-primary/20",
+          "z-[60]", // Higher than dialog overlay (50)
+          isRTL && "font-arabic"
+        )}
         disabled={isSubmitting}
       >
         {isSubmitting

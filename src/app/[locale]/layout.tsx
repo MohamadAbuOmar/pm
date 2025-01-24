@@ -1,5 +1,6 @@
 import '../globals.css';
 import { ibmPlexSans, ibmPlexSansArabic } from '@/styles/fonts';
+import { cn } from '@/lib/utils';
 import type { Metadata } from 'next';
 import { locales } from '@/i18n.config';
 import { NextIntlClientProvider } from 'next-intl';
@@ -23,8 +24,16 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'} suppressHydrationWarning>
-      <body className={`${ibmPlexSans.variable} ${ibmPlexSansArabic.variable} antialiased`}>
-        <NextIntlClientProvider messages={messages} locale={locale} timeZone="Asia/Jerusalem">
+      <body 
+        className={cn(
+          ibmPlexSans.variable,
+          ibmPlexSansArabic.variable,
+          "antialiased min-h-screen",
+          locale === 'ar' ? 'font-arabic' : 'font-sans'
+        )}
+        suppressHydrationWarning
+      >
+        <NextIntlClientProvider messages={messages} locale={locale} timeZone="UTC">
           {children}
         </NextIntlClientProvider>
       </body>

@@ -1,5 +1,10 @@
 {
   "common": {
+    "auth": {
+      "signIn": "تسجيل الدخول",
+      "login": "تسجيل الدخول",
+      "logout": "تسجيل الخروج"
+    },
     "welcome": {
       "title": "مرحباً بكم في PM",
       "subtitle": "إدارة المشاريع بشكل بسيط"
@@ -269,6 +274,15 @@
           "region": "المنطقة",
           "notes": "ملاحظات"
         },
+        "gender": {
+          "male": "ذكر",
+          "female": "أنثى",
+          "other": "آخر"
+        },
+        "partnerStatus": {
+          "yes": "نعم",
+          "no": "لا"
+        },
         "placeholders": {
           "englishName": "أدخل الاسم بالإنجليزية",
           "arabicName": "أدخل الاسم بالعربية",
@@ -305,6 +319,56 @@
       "partnerStatus": {
         "yes": "نعم",
         "no": "لا"
+      },
+      "gender": {
+        "male": "ذكر",
+        "female": "أنثى",
+        "other": "آخر"
+      },
+      "form": {
+        "addCategory": "إضافة فئة",
+        "addNewCategory": "إضافة فئة جديدة",
+        "saving": "جاري الحفظ...",
+        "create": "إنشاء",
+        "update": "تحديث",
+        "fields": {
+          "englishName": "الاسم بالإنجليزية",
+          "arabicName": "الاسم بالعربية",
+          "category": "الفئة",
+          "region": "المنطقة",
+          "email": "البريد الإلكتروني",
+          "phone": "الهاتف",
+          "fax": "الفاكس",
+          "address": "العنوان",
+          "website": "الموقع الإلكتروني",
+          "workField": "مجال العمل",
+          "gender": "الجنس",
+          "isPartner": "شريك؟",
+          "notes": "ملاحظات"
+        },
+        "placeholders": {
+          "englishName": "أدخل الاسم بالإنجليزية",
+          "arabicName": "أدخل الاسم بالعربية",
+          "category": "اختر الفئة",
+          "region": "اختر المنطقة",
+          "email": "أدخل البريد الإلكتروني",
+          "phone": "أدخل رقم الهاتف",
+          "fax": "أدخل رقم الفاكس",
+          "address": "أدخل العنوان",
+          "website": "أدخل رابط الموقع الإلكتروني",
+          "workField": "أدخل مجال العمل",
+          "gender": "اختر الجنس",
+          "notes": "أدخل الملاحظات"
+        },
+        "gender": {
+          "male": "ذكر",
+          "female": "أنثى",
+          "other": "آخر"
+        },
+        "partnerStatus": {
+          "yes": "نعم",
+          "no": "لا"
+        }
       }
     }
   }

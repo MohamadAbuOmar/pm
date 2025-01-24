@@ -13,10 +13,8 @@ export function RootLayoutProvider({ locale, children }: RootLayoutProviderProps
   const messages = useMessages();
 
   return (
-    <div className="min-h-screen font-sans">
-      <NextIntlClientProvider locale={locale as Locale} messages={messages}>
-        {children}
-      </NextIntlClientProvider>
-    </div>
+    <NextIntlClientProvider locale={locale as Locale} messages={messages}>
+      {children}
+    </NextIntlClientProvider>
   );
 }
