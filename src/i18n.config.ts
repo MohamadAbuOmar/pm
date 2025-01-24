@@ -13,15 +13,15 @@ export default getRequestConfig(async ({ locale }) => {
       messages: (await import(`@/messages/${locale}.json`)).default,
       timeZone: 'Asia/Jerusalem',
       defaultTranslationValues: {
-        strong: (chunks) => chunks,
-        p: (chunks) => <p className="mt-2">{chunks}</p>,
-        br: () => <br />,
+        strong: (chunks: string) => chunks,
+        p: (chunks: string) => chunks,
+        br: () => '',
       },
       onError: (error) => {
         console.error('i18n error:', error);
       },
-      getMessageFallback: ({ key, namespace }) => {
-        return `${namespace}.${key}`;
+      getMessageFallback: ({ key, namespace }: { key: string, namespace?: string }) => {
+        return namespace ? `${namespace}.${key}` : key;
       }
     };
   } catch (error) {
@@ -30,15 +30,15 @@ export default getRequestConfig(async ({ locale }) => {
       messages: {},
       timeZone: 'Asia/Jerusalem',
       defaultTranslationValues: {
-        strong: (chunks) => chunks,
-        p: (chunks) => <p className="mt-2">{chunks}</p>,
-        br: () => <br />,
+        strong: (chunks: string) => chunks,
+        p: (chunks: string) => chunks,
+        br: () => '',
       },
       onError: (error) => {
         console.error('i18n error:', error);
       },
-      getMessageFallback: ({ key, namespace }) => {
-        return `${namespace}.${key}`;
+      getMessageFallback: ({ key, namespace }: { key: string, namespace?: string }) => {
+        return namespace ? `${namespace}.${key}` : key;
       }
     };
   }

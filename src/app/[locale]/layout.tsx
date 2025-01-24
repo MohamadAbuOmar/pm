@@ -1,7 +1,7 @@
 import '../globals.css';
 import { ibmPlexSans } from '@/styles/fonts';
 import type { Metadata } from 'next';
-import { Locale, locales } from '@/i18n.config';
+import { locales } from '@/i18n.config';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 
@@ -12,15 +12,14 @@ export const metadata: Metadata = {
 
 interface Props {
   children: React.ReactNode;
-  params: { locale: Locale };
+  params: { locale: string };
 }
 
 export default async function RootLayout({
   children,
-  params
+  params: { locale }
 }: Props) {
-  const { locale } = params;
-  const messages = await getMessages(locale);
+  const messages = await getMessages();
 
   return (
     <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'} suppressHydrationWarning>
