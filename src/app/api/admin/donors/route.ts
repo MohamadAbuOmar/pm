@@ -2,11 +2,22 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getUserFromToken, getUserPermissions } from '@/lib/auth';
 import { donorSchema } from '@/lib/validations/donor';
+import { z } from 'zod';
 
-// List all donors
+const querySchema = z.object({
+  page: z.coerce.number().min(1).default(1),
+  pageSize: z.coerce.number().min(1).max(100).default(10),
+  search: z.string().optional(),
+  sortBy: z.enum(['id', 'englishName', 'arabicName', 'createdAt']).default('id'),
+  sortOrder: z.enum(['asc', 'desc']).default('desc'),
+  categoryId: z.coerce.number().optional(),
+  regionId: z.coerce.number().optional(),
+  isPartner: z.coerce.number().optional()
+});
+
 export async function GET(request: NextRequest) {
   try {
-    // Verify admin token
+    // Verify authentication
     const token = request.cookies.get('auth-token')?.value;
     if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -17,39 +28,98 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
-    // Verify admin has permission to view donors
     const permissions = await getUserPermissions(admin.id);
     if (!permissions.includes('manage_donors')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Get pagination parameters from query
-    const pageParam = request.nextUrl.searchParams.get('page') ?? '1';
-    const pageSizeParam = request.nextUrl.searchParams.get('pageSize') ?? '10';
-    const page = parseInt(pageParam, 10) || 1;
-    const pageSize = parseInt(pageSizeParam, 10) || 10;
+    // Parse and validate query parameters
+    const searchParams = Object.fromEntries(request.nextUrl.searchParams.entries());
+    const { 
+      page, 
+      pageSize, 
+      search, 
+      sortBy, 
+      sortOrder,
+      categoryId,
+      regionId,
+      isPartner
+    } = querySchema.parse(searchParams);
+    
+    const skip = (page - 1) * pageSize;
 
-    // Get total count for pagination metadata
-    const totalCount = await prisma.donor.count();
+    // Build where clause
+    const where: any = {};
+    
+    if (search) {
+      where.OR = [
+        { englishName: { contains: search } },
+        { arabicName: { contains: search } },
+        { email: { contains: search } }
+      ];
+    }
+    
+    if (categoryId) {
+      where.categoryId = categoryId;
+    }
+    
+    if (regionId) {
+      where.regionId = regionId;
+    }
+    
+    if (typeof isPartner === 'number') {
+      where.isPartner = isPartner;
+    }
 
-    // Fetch paginated donors
-    const donors = await prisma.donor.findMany({
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-      orderBy: { id: 'desc' },
-      include: {
-        category: true
-      }
-    });
+    // Get total count and donors with pagination in parallel
+    const [totalCount, donors] = await Promise.all([
+      prisma.donor.count({ where }),
+      prisma.donor.findMany({
+        where,
+        skip,
+        take: pageSize,
+        orderBy: { [sortBy]: sortOrder },
+        include: {
+          category: {
+            select: {
+              id: true,
+              arabicName: true,
+              englishName: true
+            }
+          },
+          region: {
+            select: {
+              id: true,
+              name: true
+            }
+          }
+        }
+      })
+    ]);
 
-    return NextResponse.json({
-      donors,
+    const response = NextResponse.json({ 
+      donors, 
       totalCount,
       page,
-      pageSize
+      pageSize,
+      totalPages: Math.ceil(totalCount / pageSize)
     });
+
+    // Add cache headers
+    response.headers.set('Cache-Control', 'private, max-age=10');
+    response.headers.set('Vary', 'Cookie, Authorization');
+
+    return response;
   } catch (error) {
     console.error('Error fetching donors:', error);
+    
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Invalid query parameters', details: error.errors },
+        { status: 400 }
+      );
+    }
+    
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -57,10 +127,9 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// Create a new donor
 export async function POST(request: NextRequest) {
   try {
-    // Verify admin token
+    // Verify authentication
     const token = request.cookies.get('auth-token')?.value;
     if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -71,14 +140,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
-    // Verify admin has permission to create donors
     const permissions = await getUserPermissions(admin.id);
     if (!permissions.includes('manage_donors')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
+    // Validate request body
     const data = donorSchema.parse(await request.json());
 
+    // Create donor
     const donor = await prisma.donor.create({
       data: {
         arabicName: data.arabicName,
@@ -96,13 +166,41 @@ export async function POST(request: NextRequest) {
         notes: data.notes
       },
       include: {
-        category: true
+        category: {
+          select: {
+            id: true,
+            arabicName: true,
+            englishName: true
+          }
+        },
+        region: {
+          select: {
+            id: true,
+            name: true
+          }
+        }
       }
     });
 
-    return NextResponse.json({ donor });
+    return NextResponse.json({ 
+      donor,
+      message: 'Donor created successfully' 
+    }, { 
+      status: 201,
+      headers: {
+        'Cache-Control': 'no-store'
+      }
+    });
   } catch (error) {
     console.error('Error creating donor:', error);
+    
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Invalid input', details: error.errors },
+        { status: 400 }
+      );
+    }
+    
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

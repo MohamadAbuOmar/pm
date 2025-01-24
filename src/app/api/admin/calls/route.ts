@@ -2,10 +2,24 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getUserFromToken, getUserPermissions } from '@/lib/auth';
 import { callSchema } from '@/lib/validations/call';
+import { z } from 'zod';
 
-// List all calls with pagination
+const querySchema = z.object({
+  page: z.coerce.number().min(1).default(1),
+  pageSize: z.coerce.number().min(1).max(100).default(10),
+  search: z.string().optional(),
+  sortBy: z.enum(['id', 'name', 'startDate', 'endDate', 'insertDate']).default('id'),
+  sortOrder: z.enum(['asc', 'desc']).default('desc'),
+  donorId: z.coerce.number().optional(),
+  startDateFrom: z.string().optional(),
+  startDateTo: z.string().optional(),
+  endDateFrom: z.string().optional(),
+  endDateTo: z.string().optional()
+});
+
 export async function GET(request: NextRequest) {
   try {
+    // Verify authentication
     const token = request.cookies.get('auth-token')?.value;
     if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -21,36 +35,97 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Get pagination parameters
-    const searchParams = request.nextUrl.searchParams;
-    const page = parseInt(searchParams.get('page') || '1');
-    const pageSize = parseInt(searchParams.get('pageSize') || '10');
+    // Parse and validate query parameters
+    const searchParams = Object.fromEntries(request.nextUrl.searchParams.entries());
+    const { 
+      page, 
+      pageSize, 
+      search, 
+      sortBy, 
+      sortOrder,
+      donorId,
+      startDateFrom,
+      startDateTo,
+      endDateFrom,
+      endDateTo
+    } = querySchema.parse(searchParams);
+    
     const skip = (page - 1) * pageSize;
 
-    // Get total count for pagination
-    const totalCount = await prisma.call.count();
+    // Build where clause
+    const where: any = {};
+    
+    if (search) {
+      where.name = { contains: search };
+    }
+    
+    if (donorId) {
+      where.donorsId = donorId;
+    }
+    
+    if (startDateFrom || startDateTo) {
+      where.startDate = {
+        ...(startDateFrom && { gte: new Date(startDateFrom) }),
+        ...(startDateTo && { lte: new Date(startDateTo) })
+      };
+    }
+    
+    if (endDateFrom || endDateTo) {
+      where.endDate = {
+        ...(endDateFrom && { gte: new Date(endDateFrom) }),
+        ...(endDateTo && { lte: new Date(endDateTo) })
+      };
+    }
 
-    // Get calls with pagination and related data
-    const calls = await prisma.call.findMany({
-      skip,
-      take: pageSize,
-      orderBy: {
-        id: 'desc'
-      },
-      include: {
-        donor: true,
-        user: {
-          select: {
-            id: true,
-            email: true
+    // Get total count and calls with pagination in parallel
+    const [totalCount, calls] = await Promise.all([
+      prisma.call.count({ where }),
+      prisma.call.findMany({
+        where,
+        skip,
+        take: pageSize,
+        orderBy: { [sortBy]: sortOrder },
+        include: {
+          donor: {
+            select: {
+              id: true,
+              arabicName: true,
+              englishName: true
+            }
+          },
+          user: {
+            select: {
+              id: true,
+              email: true
+            }
           }
         }
-      }
+      })
+    ]);
+
+    const response = NextResponse.json({ 
+      calls, 
+      totalCount,
+      page,
+      pageSize,
+      totalPages: Math.ceil(totalCount / pageSize)
     });
 
-    return NextResponse.json({ calls, totalCount });
+    // Add cache headers
+    response.headers.set('Cache-Control', 'private, max-age=10');
+    response.headers.set('Vary', 'Cookie, Authorization');
+
+    return response;
   } catch (error) {
     console.error('Error fetching calls:', error);
+    
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Invalid query parameters', details: error.errors },
+        { status: 400 }
+      );
+    }
+    
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -58,9 +133,9 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// Create a new call
 export async function POST(request: NextRequest) {
   try {
+    // Verify authentication
     const token = request.cookies.get('auth-token')?.value;
     if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -76,8 +151,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
+    // Validate request body
     const data = callSchema.parse(await request.json());
 
+    // Create call
     const call = await prisma.call.create({
       data: {
         name: data.name,
@@ -92,7 +169,13 @@ export async function POST(request: NextRequest) {
         donorsId: data.donorsId
       },
       include: {
-        donor: true,
+        donor: {
+          select: {
+            id: true,
+            arabicName: true,
+            englishName: true
+          }
+        },
         user: {
           select: {
             id: true,
@@ -102,9 +185,25 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    return NextResponse.json({ call });
+    return NextResponse.json({ 
+      call,
+      message: 'Call created successfully' 
+    }, { 
+      status: 201,
+      headers: {
+        'Cache-Control': 'no-store'
+      }
+    });
   } catch (error) {
     console.error('Error creating call:', error);
+    
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Invalid input', details: error.errors },
+        { status: 400 }
+      );
+    }
+    
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

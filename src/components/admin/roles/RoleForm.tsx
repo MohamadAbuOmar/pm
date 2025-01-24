@@ -4,10 +4,12 @@ import * as React from 'react';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslations, useLocale } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
+import { cn } from '@/lib/utils';
 import { roleSchema, type RoleInput } from '@/lib/validations/auth';
 
 interface Permission {
@@ -88,86 +90,167 @@ export function RoleForm() {
     setValue('permissions', newPermissions, { shouldValidate: true });
   };
 
+  const locale = useLocale();
+  const isRTL = locale === 'ar';
+  const t = useTranslations('admin.roles');
+
   if (isLoading) {
     return (
-      <div className="space-y-6 animate-pulse">
-        <div className="h-10 bg-gray-200 rounded"></div>
+      <div className="space-y-6">
+        {/* Role name field skeleton */}
         <div className="space-y-2">
-          <div className="h-6 bg-gray-200 rounded w-1/4"></div>
-          <div className="h-10 bg-gray-200 rounded"></div>
+          <div className="h-5 bg-gray-100/80 rounded-md w-24"></div>
+          <div className="h-10 bg-gray-100/80 rounded-md"></div>
         </div>
+
+        {/* Permissions skeleton */}
+        <div className="space-y-3">
+          <div className="h-5 bg-gray-100/80 rounded-md w-28"></div>
+          <div className="p-4 border rounded-lg bg-gray-50/50 space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex items-center gap-3">
+                <div className="h-4 w-4 bg-gray-100/80 rounded"></div>
+                <div className="h-4 bg-gray-100/80 rounded w-32"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Submit button skeleton */}
+        <div className="h-10 bg-gray-100/80 rounded-md"></div>
       </div>
     );
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <div className="space-y-2">
-        <Label htmlFor="name">Role Name</Label>
-        <Input
-          id="name"
-          {...register('name')}
-          placeholder="Enter role name"
-          aria-invalid={errors.name ? 'true' : 'false'}
-        />
-        {errors.name && (
-          <p className="text-sm text-red-500">{errors.name.message}</p>
-        )}
-      </div>
-
-      <div className="space-y-2">
-        <Label>Permissions</Label>
+      <div className="grid gap-6">
         <div className="space-y-2">
-          {permissions.map((permission) => (
-            <div key={permission.id} className="flex items-center space-x-2">
-              <Checkbox
-                id={`permission-${permission.id}`}
-                checked={selectedPermissions?.includes(permission.id)}
-                onCheckedChange={(checked) => {
-                  handlePermissionChange(permission.id, checked as boolean);
-                }}
-              />
-              <Label htmlFor={`permission-${permission.id}`}>
-                {permission.name}
-              </Label>
-            </div>
-          ))}
+          <Label 
+            htmlFor="name" 
+            className={cn(
+              "text-sm font-medium",
+              isRTL && "font-arabic"
+            )}
+          >
+            {t('form.fields.name')}
+          </Label>
+          <Input
+            id="name"
+            {...register('name')}
+            placeholder={t('form.placeholders.name')}
+            className={cn(
+              "w-full transition-colors",
+              "border-input hover:border-ring",
+              "focus:ring-2 focus:ring-ring focus:ring-offset-0",
+              "shadow-sm",
+              isRTL && "font-arabic text-right",
+              errors.name && "border-red-500 hover:border-red-500 focus:ring-red-500/20"
+            )}
+            aria-invalid={errors.name ? 'true' : 'false'}
+          />
+          {errors.name && (
+            <p className={cn(
+              "text-sm text-red-500 font-medium",
+              isRTL && "font-arabic text-right"
+            )}>
+              {errors.name.message}
+            </p>
+          )}
         </div>
-        {errors.permissions && (
-          <p className="text-sm text-red-500">{errors.permissions.message}</p>
-        )}
+
+        <div className="space-y-3">
+          <Label className={cn(
+            "text-sm font-medium",
+            isRTL && "font-arabic"
+          )}>
+            {t('form.fields.permissions')}
+          </Label>
+          <div className={cn(
+            "grid gap-3 p-4 border rounded-lg bg-gray-50/50",
+            isRTL && "font-arabic"
+          )}>
+            {permissions.map((permission) => (
+              <div key={permission.id} className={cn(
+                "flex items-center gap-3",
+                isRTL && "flex-row-reverse"
+              )}>
+                <Checkbox
+                  id={`permission-${permission.id}`}
+                  checked={selectedPermissions?.includes(permission.id)}
+                  onCheckedChange={(checked) => {
+                    handlePermissionChange(permission.id, checked as boolean);
+                  }}
+                  className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                />
+                <Label 
+                  htmlFor={`permission-${permission.id}`}
+                  className={cn(
+                    "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+                    isRTL && "font-arabic"
+                  )}
+                >
+                  {permission.name}
+                </Label>
+              </div>
+            ))}
+          </div>
+          {errors.permissions && (
+            <p className={cn(
+              "text-sm text-red-500 font-medium",
+              isRTL && "font-arabic text-right"
+            )}>
+              {errors.permissions.message}
+            </p>
+          )}
+        </div>
       </div>
 
       {error && (
-        <div className="flex items-center gap-2 p-3 text-sm rounded bg-red-50 text-red-500 border border-red-200">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+        <div className={cn(
+          "flex items-center gap-2 p-4 text-sm rounded-lg bg-red-50 text-red-500 border border-red-200",
+          isRTL && "flex-row-reverse font-arabic"
+        )}>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 shrink-0">
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
           </svg>
-          {error}
+          <p className="text-sm font-medium">{error}</p>
         </div>
       )}
       {success && (
-        <div className="flex items-center gap-2 p-3 text-sm rounded bg-green-50 text-green-500 border border-green-200">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+        <div className={cn(
+          "flex items-center gap-2 p-4 text-sm rounded-lg bg-green-50 text-green-500 border border-green-200",
+          isRTL && "flex-row-reverse font-arabic"
+        )}>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 shrink-0">
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
           </svg>
-          {success}
+          <p className="text-sm font-medium">{success}</p>
         </div>
       )}
+
       <Button
         type="submit"
-        className="w-full"
+        className={cn(
+          "w-full transition-colors",
+          "hover:bg-primary/90 focus:ring-2 focus:ring-primary/20",
+          isSubmitting && "opacity-70 cursor-not-allowed",
+          isRTL && "font-arabic"
+        )}
         disabled={isSubmitting}
       >
         {isSubmitting ? (
-          <div className="flex items-center gap-2">
+          <div className={cn(
+            "flex items-center justify-center gap-2",
+            isRTL && "flex-row-reverse"
+          )}>
             <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            Creating...
+            <span>{t('form.saving')}</span>
           </div>
-        ) : 'Create Role'}
+        ) : t('form.create')}
       </Button>
     </form>
   );

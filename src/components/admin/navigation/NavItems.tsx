@@ -66,7 +66,7 @@ export function NavItems() {
   ];
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-1 [&>a]:w-full">
       {navItems.map((item) => (
         <NavItem
           key={item.href}
