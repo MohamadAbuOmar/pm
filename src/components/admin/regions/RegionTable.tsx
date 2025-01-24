@@ -33,11 +33,39 @@ export function RegionTable() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedRegion, setSelectedRegion] = useState<Region | null>(null);
 
-  const fetchRegions = useCallback(async () => {
+  const [sortBy, setSortBy] = useState<'id' | 'name' | 'createdAt'>('id');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch] = useState(() => 
+    debounce((query: string) => {
+      setPage(1);
+      void fetchRegions(1, pageSize, query, sortBy, sortOrder);
+    }, 300)
+  );
+
+  const fetchRegions = useCallback(async (
+    currentPage: number,
+    currentPageSize: number,
+    search?: string,
+    currentSortBy: 'id' | 'name' | 'createdAt' = 'id',
+    currentSortOrder: 'asc' | 'desc' = 'desc'
+  ) => {
     try {
       setIsLoading(true);
-      const res = await fetch(`/api/admin/regions?page=${page}&pageSize=${pageSize}`);
+      const queryParams = new URLSearchParams({
+        page: currentPage.toString(),
+        pageSize: currentPageSize.toString(),
+        sortBy: currentSortBy,
+        sortOrder: currentSortOrder
+      });
+      
+      if (search) {
+        queryParams.append('search', search);
+      }
+
+      const res = await fetch(`/api/admin/regions?${queryParams}`);
       if (!res.ok) throw new Error('Failed to fetch regions');
+      
       const data = await res.json();
       setRegions(data.regions);
       setTotalCount(data.totalCount);
@@ -46,7 +74,7 @@ export function RegionTable() {
     } finally {
       setIsLoading(false);
     }
-  }, [page, pageSize]);
+  }, []);
 
   useEffect(() => {
     void fetchRegions();
@@ -93,11 +121,37 @@ export function RegionTable() {
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="h-8 bg-gray-200 rounded animate-pulse w-1/4"></div>
-        <div className="space-y-3">
-          {Array.from({ length: 5 }).map((_, idx) => (
-            <div key={idx} className="h-16 bg-gray-200 rounded animate-pulse"></div>
-          ))}
+        {/* Search and Add button skeleton */}
+        <div className="flex justify-between items-center">
+          <div className="h-10 bg-gray-200 rounded animate-pulse w-1/3"></div>
+          <div className="h-10 bg-gray-200 rounded animate-pulse w-24"></div>
+        </div>
+        
+        {/* Table skeleton */}
+        <div className="rounded-md border">
+          <div className="border-b bg-gray-50 p-3">
+            <div className="grid grid-cols-4 gap-4">
+              {Array.from({ length: 4 }).map((_, idx) => (
+                <div key={idx} className="h-6 bg-gray-200 rounded animate-pulse"></div>
+              ))}
+            </div>
+          </div>
+          <div className="space-y-3 p-3">
+            {Array.from({ length: pageSize }).map((_, idx) => (
+              <div key={idx} className="grid grid-cols-4 gap-4">
+                {Array.from({ length: 4 }).map((_, cellIdx) => (
+                  <div key={cellIdx} className="h-6 bg-gray-200 rounded animate-pulse"></div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        {/* Pagination skeleton */}
+        <div className="flex items-center justify-between mt-4">
+          <div className="h-10 bg-gray-200 rounded animate-pulse w-24"></div>
+          <div className="h-6 bg-gray-200 rounded animate-pulse w-32"></div>
+          <div className="h-10 bg-gray-200 rounded animate-pulse w-24"></div>
         </div>
       </div>
     );
