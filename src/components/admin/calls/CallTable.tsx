@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
+import { DataTable } from '@/components/ui/data-table';
 import {
   Dialog,
   DialogContent,
@@ -41,6 +43,8 @@ interface Call {
 export function CallTable() {
   const t = useTranslations('admin.calls');
   const ct = useTranslations('common');
+  const locale = useLocale();
+  const isRTL = locale === 'ar';
   const [calls, setCalls] = useState<Call[]>([]);
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
@@ -156,52 +160,110 @@ export function CallTable() {
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-6">
         {/* Search and filters skeleton */}
-        <div className="flex flex-wrap gap-4">
-          <div className="flex-1">
-            <div className="h-10 bg-gray-200 rounded animate-pulse"></div>
+        <div className={cn(
+          "flex flex-wrap items-center gap-4",
+          isRTL && "flex-row-reverse"
+        )}>
+          <div className="flex-1 min-w-[200px]">
+            <div className="h-10 bg-gray-100/80 rounded-md animate-pulse"></div>
           </div>
-          <div className="w-40">
-            <div className="h-10 bg-gray-200 rounded animate-pulse"></div>
-          </div>
-          <div className="w-40">
-            <div className="h-10 bg-gray-200 rounded animate-pulse"></div>
+          <div className={cn(
+            "flex gap-3",
+            isRTL && "flex-row-reverse"
+          )}>
+            <div className="w-44">
+              <div className="h-10 bg-gray-100/80 rounded-md animate-pulse"></div>
+            </div>
+            <div className="w-44">
+              <div className="h-10 bg-gray-100/80 rounded-md animate-pulse"></div>
+            </div>
           </div>
         </div>
         
         {/* Date filters skeleton */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <div className="h-5 bg-gray-200 rounded animate-pulse w-1/4"></div>
-            <div className="flex gap-2">
-              <div className="h-10 bg-gray-200 rounded animate-pulse flex-1"></div>
-              <div className="h-10 bg-gray-200 rounded animate-pulse flex-1"></div>
+        <div className={cn(
+          "grid grid-cols-1 md:grid-cols-2 gap-6",
+          isRTL && "font-arabic"
+        )}>
+          <div className={cn(
+            "space-y-3",
+            isRTL && "text-right"
+          )}>
+            <div className={cn(
+              "h-5 bg-gray-100/80 rounded-md animate-pulse w-1/4",
+              isRTL && "mr-auto"
+            )}></div>
+            <div className={cn(
+              "flex gap-3",
+              isRTL && "flex-row-reverse"
+            )}>
+              <div className="flex-1 space-y-1.5">
+                <div className="h-4 bg-gray-100/80 rounded-md animate-pulse w-1/3"></div>
+                <div className="h-10 bg-gray-100/80 rounded-md animate-pulse"></div>
+              </div>
+              <div className="flex-1 space-y-1.5">
+                <div className="h-4 bg-gray-100/80 rounded-md animate-pulse w-1/3"></div>
+                <div className="h-10 bg-gray-100/80 rounded-md animate-pulse"></div>
+              </div>
             </div>
           </div>
-          <div className="space-y-2">
-            <div className="h-5 bg-gray-200 rounded animate-pulse w-1/4"></div>
-            <div className="flex gap-2">
-              <div className="h-10 bg-gray-200 rounded animate-pulse flex-1"></div>
-              <div className="h-10 bg-gray-200 rounded animate-pulse flex-1"></div>
+          <div className={cn(
+            "space-y-3",
+            isRTL && "text-right"
+          )}>
+            <div className={cn(
+              "h-5 bg-gray-100/80 rounded-md animate-pulse w-1/4",
+              isRTL && "mr-auto"
+            )}></div>
+            <div className={cn(
+              "flex gap-3",
+              isRTL && "flex-row-reverse"
+            )}>
+              <div className="flex-1 space-y-1.5">
+                <div className="h-4 bg-gray-100/80 rounded-md animate-pulse w-1/3"></div>
+                <div className="h-10 bg-gray-100/80 rounded-md animate-pulse"></div>
+              </div>
+              <div className="flex-1 space-y-1.5">
+                <div className="h-4 bg-gray-100/80 rounded-md animate-pulse w-1/3"></div>
+                <div className="h-10 bg-gray-100/80 rounded-md animate-pulse"></div>
+              </div>
             </div>
           </div>
         </div>
+
+        {/* Add button skeleton */}
+        <div className={cn(
+          "flex",
+          isRTL && "justify-end"
+        )}>
+          <div className="h-10 w-32 bg-gray-100/80 rounded-md animate-pulse"></div>
+        </div>
         
         {/* Table skeleton */}
-        <div className="rounded-md border">
-          <div className="border-b bg-gray-50 p-3">
-            <div className="grid grid-cols-8 gap-4">
+        <div className={cn(
+          "rounded-md border shadow-sm bg-white overflow-hidden",
+          isRTL && "font-arabic"
+        )}>
+          <div className="border-b bg-gray-50/50 p-4">
+            <div className={cn(
+              "grid grid-cols-8 gap-4",
+              isRTL && "text-right"
+            )}>
               {Array.from({ length: 8 }).map((_, idx) => (
-                <div key={idx} className="h-6 bg-gray-200 rounded animate-pulse"></div>
+                <div key={idx} className="h-6 bg-gray-100/80 rounded-md animate-pulse"></div>
               ))}
             </div>
           </div>
-          <div className="space-y-3 p-3">
+          <div className="p-4 space-y-4">
             {Array.from({ length: pageSize }).map((_, idx) => (
-              <div key={idx} className="grid grid-cols-8 gap-4">
+              <div key={idx} className={cn(
+                "grid grid-cols-8 gap-4",
+                isRTL && "text-right"
+              )}>
                 {Array.from({ length: 8 }).map((_, cellIdx) => (
-                  <div key={cellIdx} className="h-6 bg-gray-200 rounded animate-pulse"></div>
+                  <div key={cellIdx} className="h-6 bg-gray-100/80 rounded-md animate-pulse"></div>
                 ))}
               </div>
             ))}
@@ -209,10 +271,16 @@ export function CallTable() {
         </div>
         
         {/* Pagination skeleton */}
-        <div className="flex items-center justify-between mt-4">
-          <div className="h-10 bg-gray-200 rounded animate-pulse w-24"></div>
-          <div className="h-6 bg-gray-200 rounded animate-pulse w-32"></div>
-          <div className="h-10 bg-gray-200 rounded animate-pulse w-24"></div>
+        <div className={cn(
+          "flex items-center justify-between mt-6",
+          isRTL && "flex-row-reverse"
+        )}>
+          <div className="h-10 bg-gray-100/80 rounded-md animate-pulse w-24"></div>
+          <div className={cn(
+            "h-6 bg-gray-100/80 rounded-md animate-pulse w-32",
+            isRTL && "font-arabic"
+          )}></div>
+          <div className="h-10 bg-gray-100/80 rounded-md animate-pulse w-24"></div>
         </div>
       </div>
     );
@@ -221,16 +289,28 @@ export function CallTable() {
   return (
     <div className="space-y-4">
       {error && (
-        <Alert variant="destructive">
+        <Alert 
+          variant="destructive"
+          className={cn(
+            "mb-4 border-destructive/50 text-destructive",
+            isRTL && "font-arabic text-right"
+          )}
+        >
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
       {/* Search and filters */}
-      <div className="flex flex-wrap gap-4">
+      <div className={cn(
+        "flex flex-wrap items-center gap-4 mb-6",
+        isRTL && "flex-row-reverse"
+      )}>
         <div className="flex-1">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <div className="relative group">
+            <Search className={cn(
+              "absolute top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 transition-colors group-hover:text-gray-500",
+              isRTL ? "right-3" : "left-3"
+            )} />
             <Input
               placeholder={t('search')}
               value={searchQuery}
@@ -238,187 +318,394 @@ export function CallTable() {
                 setSearchQuery(e.target.value);
                 debouncedSearch(e.target.value);
               }}
-              className="pl-9"
+              className={cn(
+                "transition-all duration-200 border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-sm",
+                isRTL ? "pr-9 font-arabic text-right" : "pl-9",
+                "placeholder:text-gray-400 hover:border-gray-300"
+              )}
             />
           </div>
         </div>
-        <Select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-          className="w-40"
-        >
-          <option value="id">{t('table.id')}</option>
-          <option value="name">{t('table.name')}</option>
-          <option value="startDate">{t('table.startDate')}</option>
-          <option value="endDate">{t('table.endDate')}</option>
-          <option value="insertDate">{t('table.insertDate')}</option>
-        </Select>
-        <Select
-          value={sortOrder}
-          onChange={(e) => setSortOrder(e.target.value as typeof sortOrder)}
-          className="w-40"
-        >
-          <option value="asc">{t('sort.ascending')}</option>
-          <option value="desc">{t('sort.descending')}</option>
-        </Select>
+        <div className={cn(
+          "flex gap-3",
+          isRTL && "flex-row-reverse"
+        )}>
+          <Select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+            className={cn(
+              "w-44 transition-all duration-200 border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-sm",
+              isRTL && "font-arabic text-right",
+              "hover:border-gray-300"
+            )}
+          >
+            <option value="id">{t('table.id')}</option>
+            <option value="name">{t('table.name')}</option>
+            <option value="startDate">{t('table.startDate')}</option>
+            <option value="endDate">{t('table.endDate')}</option>
+            <option value="insertDate">{t('table.insertDate')}</option>
+          </Select>
+          <Select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value as typeof sortOrder)}
+            className={cn(
+              "w-44 transition-all duration-200 border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-sm",
+              isRTL && "font-arabic text-right",
+              "hover:border-gray-300"
+            )}
+          >
+            <option value="asc">{t('sort.ascending')}</option>
+            <option value="desc">{t('sort.descending')}</option>
+          </Select>
+        </div>
       </div>
 
       {/* Date filters */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <label className="text-sm font-medium flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
+      <div className={cn(
+        "grid grid-cols-1 md:grid-cols-2 gap-6 mb-6",
+        isRTL && "font-arabic"
+      )}>
+        <div className={cn(
+          "space-y-3",
+          isRTL && "text-right"
+        )}>
+          <label className={cn(
+            "text-sm font-medium flex items-center gap-2 text-gray-700",
+            isRTL && "flex-row-reverse justify-end"
+          )}>
+            <Calendar className="h-4 w-4 text-gray-500" />
             {t('filters.startDate')}
           </label>
-          <div className="flex gap-2">
-            <Input
-              type="date"
-              value={startDateFrom}
-              onChange={(e) => {
-                setStartDateFrom(e.target.value);
-                setPage(1);
-              }}
-              className="flex-1"
-            />
-            <Input
-              type="date"
-              value={startDateTo}
-              onChange={(e) => {
-                setStartDateTo(e.target.value);
-                setPage(1);
-              }}
-              className="flex-1"
-            />
+          <div className={cn(
+            "flex gap-3",
+            isRTL && "flex-row-reverse"
+          )}>
+            <div className="flex-1 space-y-1.5">
+              <label className={cn(
+                "text-xs text-gray-500",
+                isRTL && "block text-right"
+              )}>
+                {t('filters.from')}
+              </label>
+              <Input
+                type="date"
+                value={startDateFrom}
+                onChange={(e) => {
+                  setStartDateFrom(e.target.value);
+                  setPage(1);
+                }}
+                className={cn(
+                  "w-full transition-all duration-200 border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-sm",
+                  isRTL && "text-right",
+                  "hover:border-gray-300"
+                )}
+              />
+            </div>
+            <div className="flex-1 space-y-1.5">
+              <label className={cn(
+                "text-xs text-gray-500",
+                isRTL && "block text-right"
+              )}>
+                {t('filters.to')}
+              </label>
+              <Input
+                type="date"
+                value={startDateTo}
+                onChange={(e) => {
+                  setStartDateTo(e.target.value);
+                  setPage(1);
+                }}
+                className={cn(
+                  "w-full transition-all duration-200 border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-sm",
+                  isRTL && "text-right",
+                  "hover:border-gray-300"
+                )}
+              />
+            </div>
           </div>
         </div>
-        <div className="space-y-2">
-          <label className="text-sm font-medium flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
+        <div className={cn(
+          "space-y-3",
+          isRTL && "text-right"
+        )}>
+          <label className={cn(
+            "text-sm font-medium flex items-center gap-2 text-gray-700",
+            isRTL && "flex-row-reverse justify-end"
+          )}>
+            <Calendar className="h-4 w-4 text-gray-500" />
             {t('filters.endDate')}
           </label>
-          <div className="flex gap-2">
-            <Input
-              type="date"
-              value={endDateFrom}
-              onChange={(e) => {
-                setEndDateFrom(e.target.value);
-                setPage(1);
-              }}
-              className="flex-1"
-            />
-            <Input
-              type="date"
-              value={endDateTo}
-              onChange={(e) => {
-                setEndDateTo(e.target.value);
-                setPage(1);
-              }}
-              className="flex-1"
-            />
+          <div className={cn(
+            "flex gap-3",
+            isRTL && "flex-row-reverse"
+          )}>
+            <div className="flex-1 space-y-1.5">
+              <label className={cn(
+                "text-xs text-gray-500",
+                isRTL && "block text-right"
+              )}>
+                {t('filters.from')}
+              </label>
+              <Input
+                type="date"
+                value={endDateFrom}
+                onChange={(e) => {
+                  setEndDateFrom(e.target.value);
+                  setPage(1);
+                }}
+                className={cn(
+                  "w-full transition-all duration-200 border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-sm",
+                  isRTL && "text-right",
+                  "hover:border-gray-300"
+                )}
+              />
+            </div>
+            <div className="flex-1 space-y-1.5">
+              <label className={cn(
+                "text-xs text-gray-500",
+                isRTL && "block text-right"
+              )}>
+                {t('filters.to')}
+              </label>
+              <Input
+                type="date"
+                value={endDateTo}
+                onChange={(e) => {
+                  setEndDateTo(e.target.value);
+                  setPage(1);
+                }}
+                className={cn(
+                  "w-full transition-all duration-200 border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-sm",
+                  isRTL && "text-right",
+                  "hover:border-gray-300"
+                )}
+              />
+            </div>
           </div>
         </div>
       </div>
 
       {/* Add new call button */}
-      <div>
+      <div className={cn(
+        "flex",
+        isRTL && "justify-end"
+      )}>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
+            <Button className={cn(
+                "flex items-center gap-2 transition-colors hover:bg-primary/90",
+                isRTL && "font-arabic flex-row-reverse"
+              )}>
+              <Plus className="w-4 h-4" />
               {t('addNew')}
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className={cn(
+            "transition-all duration-200",
+            isRTL && "font-arabic"
+          )}>
             <DialogHeader>
-              <DialogTitle>
+              <DialogTitle className={cn(
+                "text-lg font-semibold",
+                isRTL && "text-right"
+              )}>
                 {selectedCall ? t('editCall') : t('addNewCall')}
               </DialogTitle>
             </DialogHeader>
             <CallForm
               call={selectedCall}
               onSuccess={handleFormSubmit}
+              locale={locale}
             />
           </DialogContent>
         </Dialog>
       </div>
 
       {/* Calls table */}
-      <div className="rounded-md border">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b bg-gray-50">
-              <th className="p-3 text-left font-medium">{t('table.id')}</th>
-              <th className="p-3 text-left font-medium">{t('table.name')}</th>
-              <th className="p-3 text-left font-medium">{t('table.focalPoint')}</th>
-              <th className="p-3 text-left font-medium">{t('table.budget')}</th>
-              <th className="p-3 text-left font-medium">{t('table.currency')}</th>
-              <th className="p-3 text-left font-medium">{t('table.donor')}</th>
-              <th className="p-3 text-left font-medium">{t('table.startDate')}</th>
-              <th className="p-3 text-left font-medium">{t('table.endDate')}</th>
-              <th className="p-3 text-left font-medium">{t('table.actions')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {calls.map((call) => (
-              <tr key={call.id} className="border-b hover:bg-gray-50">
-                <td className="p-3">{call.id}</td>
-                <td className="p-3">{call.name}</td>
-                <td className="p-3">{call.focalPoint || '-'}</td>
-                <td className="p-3">{call.budget || '-'}</td>
-                <td className="p-3">{call.currency}</td>
-                <td className="p-3">
-                  {call.donor.englishName || call.donor.arabicName || '-'}
-                </td>
-                <td className="p-3">
-                  {call.startDate
-                    ? new Date(call.startDate).toLocaleDateString()
-                    : '-'}
-                </td>
-                <td className="p-3">
-                  {call.endDate
-                    ? new Date(call.endDate).toLocaleDateString()
-                    : '-'}
-                </td>
-                <td className="p-3">
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEdit(call)}
-                    >
-                      {ct('actions.edit')}
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDelete(call.id)}
-                    >
-                      {ct('actions.delete')}
-                    </Button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <DataTable
+        data={calls}
+        className={cn(
+          "rounded-md border shadow-sm bg-white",
+          isRTL && "font-arabic"
+        )}
+        columns={[
+          {
+            key: 'id',
+            header: t('table.id'),
+            cell: (call) => (
+              <span className={cn(
+                "block font-medium tabular-nums",
+                isRTL && "font-arabic text-right"
+              )}>
+                {call.id}
+              </span>
+            )
+          },
+          {
+            key: 'name',
+            header: t('table.name'),
+            cell: (call) => (
+              <div className={cn(
+                "font-medium line-clamp-1",
+                isRTL && "text-right font-arabic"
+              )}>
+                {call.name}
+              </div>
+            )
+          },
+          {
+            key: 'focalPoint',
+            header: t('table.focalPoint'),
+            cell: (call) => (
+              <span className={cn(
+                "block text-muted-foreground",
+                isRTL && "font-arabic text-right"
+              )}>
+                {call.focalPoint || '-'}
+              </span>
+            )
+          },
+          {
+            key: 'budget',
+            header: t('table.budget'),
+            cell: (call) => (
+              <span className={cn(
+                "block font-medium tabular-nums",
+                isRTL ? "font-arabic text-right" : "text-left"
+              )}>
+                {call.budget || '-'}
+              </span>
+            )
+          },
+          {
+            key: 'currency',
+            header: t('table.currency'),
+            cell: (call) => (
+              <span className={cn(
+                "block text-muted-foreground",
+                isRTL && "font-arabic text-right"
+              )}>
+                {call.currency}
+              </span>
+            )
+          },
+          {
+            key: 'donor',
+            header: t('table.donor'),
+            cell: (call) => (
+              <div className={cn(
+                "flex flex-col gap-0.5",
+                isRTL && "items-end font-arabic"
+              )}>
+                <span className="font-medium">
+                  {isRTL ? call.donor.arabicName : call.donor.englishName || '-'}
+                </span>
+                <span className="text-sm text-muted-foreground">
+                  {isRTL ? call.donor.englishName : call.donor.arabicName || '-'}
+                </span>
+              </div>
+            )
+          },
+          {
+            key: 'startDate',
+            header: t('table.startDate'),
+            cell: (call) => (
+              <div className={cn(
+                "whitespace-nowrap text-muted-foreground",
+                isRTL && "text-right font-arabic"
+              )}>
+                {call.startDate
+                  ? new Date(call.startDate).toLocaleDateString(locale, {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })
+                  : '-'}
+              </div>
+            )
+          },
+          {
+            key: 'endDate',
+            header: t('table.endDate'),
+            cell: (call) => (
+              <div className={cn(
+                "whitespace-nowrap text-muted-foreground",
+                isRTL && "text-right font-arabic"
+              )}>
+                {call.endDate
+                  ? new Date(call.endDate).toLocaleDateString(locale, {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })
+                  : '-'}
+              </div>
+            )
+          },
+          {
+            key: 'actions',
+            header: t('table.actions'),
+            cell: (call) => (
+              <div className={cn(
+                "flex items-center gap-2",
+                isRTL && "flex-row-reverse justify-start"
+              )}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleEdit(call)}
+                  className={cn(
+                    "transition-colors hover:bg-primary/10 focus:ring-2 focus:ring-primary/20",
+                    isRTL && "font-arabic"
+                  )}
+                >
+                  {ct('actions.edit')}
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => handleDelete(call.id)}
+                  className={cn(
+                    "transition-colors hover:bg-destructive/90 focus:ring-2 focus:ring-destructive/20",
+                    isRTL && "font-arabic"
+                  )}
+                >
+                  {ct('actions.delete')}
+                </Button>
+              </div>
+            )
+          }
+        ]}
+      />
 
       {/* Pagination */}
-      <div className="flex items-center justify-between">
+      <div className={cn(
+        "flex items-center justify-between",
+        isRTL && "flex-row-reverse"
+      )}>
         <Button 
           variant="outline" 
           onClick={handlePrevPage} 
           disabled={page <= 1}
+          className={cn(
+            isRTL && "font-arabic"
+          )}
         >
           {ct('actions.previous')}
         </Button>
-        <div className="text-sm text-gray-600">
+        <div className={cn(
+          "text-sm text-gray-600",
+          isRTL && "font-arabic"
+        )}>
           {ct('pagination.page')} {page} {ct('pagination.of')} {Math.ceil(totalCount / pageSize)}
         </div>
         <Button 
           variant="outline" 
           onClick={handleNextPage} 
           disabled={page * pageSize >= totalCount}
+          className={cn(
+            isRTL && "font-arabic"
+          )}
         >
           {ct('actions.next')}
         </Button>
