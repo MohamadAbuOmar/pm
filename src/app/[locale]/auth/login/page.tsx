@@ -10,7 +10,7 @@ export default async function LoginPage({
   const t = await getTranslations('auth.login');
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
+    <div className="flex min-h-screen items-center justify-center p-4" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
       <div className="absolute top-4 right-4">
         <LanguageSwitcher />
       </div>
