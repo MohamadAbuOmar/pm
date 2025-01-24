@@ -7,6 +7,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { DataTable } from '@/components/ui/data-table';
+import { cn } from '@/lib/utils';
 import {
   Dialog,
   DialogContent,
@@ -39,6 +40,8 @@ interface Donor {
 export function DonorTable() {
   const t = useTranslations('admin.donors');
   const ct = useTranslations('common');
+  const locale = useLocale();
+  const isRTL = locale === 'ar';
   const [donors, setDonors] = useState<Donor[]>([]);
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);

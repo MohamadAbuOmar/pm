@@ -1,5 +1,5 @@
 import '../globals.css';
-import { ibmPlexSans } from '@/styles/fonts';
+import { ibmPlexSans, ibmPlexSansArabic } from '@/styles/fonts';
 import type { Metadata } from 'next';
 import { locales } from '@/i18n.config';
 import { NextIntlClientProvider } from 'next-intl';
@@ -17,14 +17,13 @@ interface Props {
 
 export default async function RootLayout({
   children,
-  params
+  params: { locale }
 }: Props) {
-  const locale = await params.locale;
-  const messages = await getMessages();
+  const messages = await getMessages(locale);
 
   return (
     <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'} suppressHydrationWarning>
-      <body className={`${ibmPlexSans.variable} antialiased`}>
+      <body className={`${ibmPlexSans.variable} ${ibmPlexSansArabic.variable} antialiased`}>
         <NextIntlClientProvider messages={messages} locale={locale} timeZone="Asia/Jerusalem">
           {children}
         </NextIntlClientProvider>
