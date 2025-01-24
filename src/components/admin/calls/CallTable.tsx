@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/dialog';
 import { CallForm } from './CallForm';
 import { Plus, Search, Calendar } from 'lucide-react';
-import { debounce } from 'lodash';
+import { debounce } from '@/lib/utils/debounce';
 
 interface Call {
   id: number;

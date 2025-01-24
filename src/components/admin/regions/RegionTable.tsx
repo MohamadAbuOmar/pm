@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/dialog';
 import { RegionForm } from './RegionForm';
 import { Plus, Search } from 'lucide-react';
-import { debounce } from 'lodash';
+import { debounce } from '@/lib/utils/debounce';
 
 interface Region {
   id: number;

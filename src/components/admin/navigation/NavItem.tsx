@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ReactNode } from 'react';
+import { useLocale } from 'next-intl';
 
 interface NavItemProps {
   href: string;

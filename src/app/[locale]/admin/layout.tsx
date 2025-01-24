@@ -10,8 +10,9 @@ interface Props {
 
 export default async function Layout({
   children,
-  params: { locale }
+  params
 }: Props) {
+  const locale = await params.locale;
   const messages = await getMessages();
 
   return (
