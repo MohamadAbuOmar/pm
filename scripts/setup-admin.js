@@ -9,14 +9,19 @@ async function setupAdmin() {
     const password = 'Admin123!';
     const saltRounds = 10;
     
-    console.log('Creating admin user...');
-    
-    // Hash the password
-    const hashedPassword = await hash(password, saltRounds);
+    console.log('Setting up admin user and permissions...');
     
     // Create admin permissions
-    const permissions = ['create_user', 'manage_roles', 'manage_permissions', 'manage_donors'];
+    const permissions = [
+      'create_user',
+      'manage_roles',
+      'manage_permissions',
+      'manage_donors',
+      'manage_regions',
+      'manage_calls'
+    ];
     
+    // Create or update permissions
     for (const permName of permissions) {
       await prisma.permission.upsert({
         where: { name: permName },
@@ -25,7 +30,7 @@ async function setupAdmin() {
       });
     }
     
-    // Create admin role with permissions
+    // Create or update admin role with permissions
     const role = await prisma.role.upsert({
       where: { name: 'Admin' },
       create: {
@@ -38,29 +43,60 @@ async function setupAdmin() {
           }))
         }
       },
-      update: {}
+      update: {
+        permissions: {
+          deleteMany: {},
+          create: permissions.map(name => ({
+            permission: {
+              connect: { name }
+            }
+          }))
+        }
+      }
     });
-    
-    // Create admin user
-    const user = await prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        roles: {
-          create: {
-            role: {
-              connect: {
-                id: role.id
+
+    // Find existing admin user or create new one
+    const existingUser = await prisma.user.findUnique({
+      where: { email }
+    });
+
+    if (existingUser) {
+      // Update existing user's roles
+      await prisma.userRole.deleteMany({
+        where: { userId: existingUser.id }
+      });
+      
+      await prisma.userRole.create({
+        data: {
+          user: { connect: { id: existingUser.id } },
+          role: { connect: { id: role.id } }
+        }
+      });
+
+      console.log('Admin user updated successfully:', { id: existingUser.id, email: existingUser.email });
+    } else {
+      // Create new admin user
+      const hashedPassword = await hash(password, saltRounds);
+      const user = await prisma.user.create({
+        data: {
+          email,
+          password: hashedPassword,
+          roles: {
+            create: {
+              role: {
+                connect: {
+                  id: role.id
+                }
               }
             }
           }
         }
-      }
-    });
-    
-    console.log('Admin user created successfully:', { id: user.id, email: user.email });
+      });
+      
+      console.log('Admin user created successfully:', { id: user.id, email: user.email });
+    }
   } catch (error) {
-    console.error('Error creating admin user:', error);
+    console.error('Error setting up admin user:', error);
   } finally {
     await prisma.$disconnect();
   }

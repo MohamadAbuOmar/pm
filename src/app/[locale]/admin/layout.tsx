@@ -1,27 +1,28 @@
-import { getTranslations } from 'next-intl/server';
 import { AdminLayoutClient } from '@/components/admin/layouts/AdminLayoutClient';
-import { Metadata } from 'next';
 import { ReactNode } from 'react';
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages } from 'next-intl/server';
 
-export const metadata: Metadata = {
-  title: 'Admin Dashboard - PM',
-  description: 'Admin dashboard for project management system'
-};
-
-interface LayoutProps {
+interface Props {
   children: ReactNode;
   params: { locale: string };
 }
 
-export default async function AdminLayout({
+export default async function Layout({
   children,
   params: { locale }
-}: LayoutProps) {
-  const t = await getTranslations('admin.layout');
+}: Props) {
+  const messages = await getMessages();
 
   return (
-    <AdminLayoutClient title={t('title')} locale={locale}>
-      {children}
-    </AdminLayoutClient>
+    <NextIntlClientProvider locale={locale} messages={messages}>
+      <AdminLayoutClient locale={locale}>
+        {children}
+      </AdminLayoutClient>
+    </NextIntlClientProvider>
   );
+}
+
+export function generateStaticParams() {
+  return [{ locale: 'en' }, { locale: 'ar' }];
 }

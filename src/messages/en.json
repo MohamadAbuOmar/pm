@@ -69,7 +69,81 @@
         "users": "Manage Users",
         "roles": "Manage Roles",
         "permissions": "Manage Permissions",
-        "donors": "Manage Donors"
+        "donors": "Manage Donors",
+        "regions": "Manage Regions",
+        "calls": "Manage Calls"
+      }
+    },
+    "regions": {
+      "title": "Region Management",
+      "addNew": "Add New Region",
+      "addNewRegion": "Add New Region",
+      "editRegion": "Edit Region",
+      "confirmDelete": "Are you sure you want to delete this region?",
+      "table": {
+        "id": "ID",
+        "name": "Name",
+        "createdAt": "Created At",
+        "actions": "Actions"
+      },
+      "form": {
+        "fields": {
+          "name": "Region Name"
+        },
+        "placeholders": {
+          "name": "Enter region name"
+        },
+        "saving": "Saving...",
+        "update": "Update Region",
+        "create": "Create Region"
+      }
+    },
+    "calls": {
+      "title": "Call Management",
+      "addNew": "Add New Call",
+      "addNewCall": "Add New Call",
+      "editCall": "Edit Call",
+      "confirmDelete": "Are you sure you want to delete this call?",
+      "table": {
+        "id": "ID",
+        "name": "Name",
+        "focalPoint": "Focal Point",
+        "budget": "Budget",
+        "currency": "Currency",
+        "donorContribution": "Donor Contribution",
+        "uawcContribution": "UAWC Contribution",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "donor": "Donor",
+        "createdBy": "Created By",
+        "actions": "Actions"
+      },
+      "form": {
+        "fields": {
+          "name": "Call Name",
+          "focalPoint": "Focal Point",
+          "budget": "Budget",
+          "currency": "Currency",
+          "donorContribution": "Donor Contribution",
+          "uawcContribution": "UAWC Contribution",
+          "startDate": "Start Date",
+          "endDate": "End Date",
+          "donor": "Donor"
+        },
+        "placeholders": {
+          "name": "Enter call name",
+          "focalPoint": "Enter focal point name",
+          "budget": "Enter budget amount",
+          "currency": "Select currency",
+          "donorContribution": "Enter donor contribution",
+          "uawcContribution": "Enter UAWC contribution",
+          "startDate": "Select start date",
+          "endDate": "Select end date",
+          "donor": "Select donor"
+        },
+        "saving": "Saving...",
+        "update": "Update Call",
+        "create": "Create Call"
       }
     },
     "donors": {

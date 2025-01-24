@@ -7,7 +7,9 @@ import {
   Users, 
   Shield, 
   Key,
-  HandHeart
+  HandHeart,
+  Globe,
+  PhoneCall
 } from 'lucide-react';
 import { NavItem } from './NavItem';
 
@@ -48,6 +50,18 @@ export function NavItems() {
       icon: <HandHeart className="w-5 h-5" />,
       label: t('donors'),
       isActive: isActive('/admin/donors')
+    },
+    {
+      href: `/${locale}/admin/regions`,
+      icon: <Globe className="w-5 h-5" />,
+      label: t('regions'),
+      isActive: isActive('/admin/regions')
+    },
+    {
+      href: `/${locale}/admin/calls`,
+      icon: <PhoneCall className="w-5 h-5" />,
+      label: t('calls'),
+      isActive: isActive('/admin/calls')
     }
   ];
 

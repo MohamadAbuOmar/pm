@@ -5,15 +5,16 @@ import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { NavItems } from '@/components/admin/navigation/NavItems';
+import { useTranslations } from 'next-intl';
 
 interface AdminLayoutClientProps {
   children: React.ReactNode;
-  title: string;
   locale: string;
 }
 
-export function AdminLayoutClient({ children, title, locale }: AdminLayoutClientProps) {
+export function AdminLayoutClient({ children, locale }: AdminLayoutClientProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const t = useTranslations('admin.layout');
 
   return (
     <div className="min-h-screen flex" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
@@ -42,7 +43,7 @@ export function AdminLayoutClient({ children, title, locale }: AdminLayoutClient
       >
         <nav className="p-4 space-y-2 h-full overflow-y-auto">
           <div className="mb-8 flex items-center justify-between">
-            <h2 className="text-xl font-semibold">{title}</h2>
+            <h2 className="text-xl font-semibold">{t('title')}</h2>
             <LanguageSwitcher />
           </div>
           <NavItems />
