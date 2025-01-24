@@ -51,7 +51,7 @@ export function DataTable<T>({ data, columns, className }: DataTableProps<T>) {
             '[&_tr:last-child]:border-0',
             isRTL && '[&_tr]:flex-row-reverse'
           )}>
-            {data.map((row, i) => (
+            {(data || []).map((row, i) => (
               <tr
                 key={i}
                 className={cn(

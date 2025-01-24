@@ -1,5 +1,10 @@
 {
   "common": {
+    "auth": {
+      "signIn": "Sign In",
+      "login": "Login",
+      "logout": "Logout"
+    },
     "welcome": {
       "title": "Welcome to PM",
       "subtitle": "Project Management made simple"
@@ -212,6 +217,11 @@
       "form": {
         "title": "Add New Donor",
         "edit": "Edit Donor",
+        "addCategory": "Add Category",
+        "addNewCategory": "Add New Category",
+        "create": "Create Donor",
+        "update": "Update Donor",
+        "saving": "Saving...",
         "fields": {
           "englishName": "English Name",
           "arabicName": "Arabic Name",
@@ -226,6 +236,15 @@
           "gender": "Gender",
           "notes": "Notes",
           "region": "Region"
+        },
+        "gender": {
+          "male": "Male",
+          "female": "Female",
+          "other": "Other"
+        },
+        "partnerStatus": {
+          "yes": "Yes",
+          "no": "No"
         },
         "placeholders": {
           "englishName": "Enter English name",
@@ -259,6 +278,56 @@
       "partnerStatus": {
         "yes": "Yes",
         "no": "No"
+      },
+      "gender": {
+        "male": "Male",
+        "female": "Female",
+        "other": "Other"
+      },
+      "form": {
+        "addCategory": "Add Category",
+        "addNewCategory": "Add New Category",
+        "saving": "Saving...",
+        "create": "Create",
+        "update": "Update",
+        "fields": {
+          "englishName": "English Name",
+          "arabicName": "Arabic Name",
+          "category": "Category",
+          "region": "Region",
+          "email": "Email",
+          "phone": "Phone",
+          "fax": "Fax",
+          "address": "Address",
+          "website": "Website",
+          "workField": "Work Field",
+          "gender": "Gender",
+          "isPartner": "Is Partner?",
+          "notes": "Notes"
+        },
+        "placeholders": {
+          "englishName": "Enter English name",
+          "arabicName": "Enter Arabic name",
+          "category": "Select category",
+          "region": "Select region",
+          "email": "Enter email address",
+          "phone": "Enter phone number",
+          "fax": "Enter fax number",
+          "address": "Enter address",
+          "website": "Enter website URL",
+          "workField": "Enter work field",
+          "gender": "Select gender",
+          "notes": "Enter notes"
+        },
+        "gender": {
+          "male": "Male",
+          "female": "Female",
+          "other": "Other"
+        },
+        "partnerStatus": {
+          "yes": "Yes",
+          "no": "No"
+        }
       }
     }
   }

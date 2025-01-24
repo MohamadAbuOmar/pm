@@ -51,11 +51,11 @@ export function RegionTable() {
   );
 
   const fetchRegions = useCallback(async (
-    currentPage: number,
-    currentPageSize: number,
+    currentPage: number = page,
+    currentPageSize: number = pageSize,
     search?: string,
-    currentSortBy: 'id' | 'name' | 'createdAt' = 'id',
-    currentSortOrder: 'asc' | 'desc' = 'desc'
+    currentSortBy: 'id' | 'name' | 'createdAt' = sortBy,
+    currentSortOrder: 'asc' | 'desc' = sortOrder
   ) => {
     try {
       setIsLoading(true);
@@ -73,19 +73,23 @@ export function RegionTable() {
       const res = await fetch(`/api/admin/regions?${queryParams}`);
       if (!res.ok) throw new Error('Failed to fetch regions');
       
-      const data = await res.json();
-      setRegions(data.regions);
-      setTotalCount(data.totalCount);
+      const { regions: fetchedRegions, totalCount } = await res.json();
+      if (Array.isArray(fetchedRegions)) {
+        setRegions(fetchedRegions);
+        setTotalCount(totalCount);
+      } else {
+        throw new Error('Invalid response format');
+      }
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'Failed to fetch regions');
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [page, pageSize, sortBy, sortOrder]);
 
   useEffect(() => {
-    void fetchRegions();
-  }, [fetchRegions]);
+    void fetchRegions(page, pageSize, searchQuery, sortBy, sortOrder);
+  }, [fetchRegions, page, pageSize, searchQuery, sortBy, sortOrder]);
 
   const handleEdit = (region: Region) => {
     setSelectedRegion(region);
@@ -101,7 +105,7 @@ export function RegionTable() {
       });
 
       if (!res.ok) throw new Error('Failed to delete region');
-      void fetchRegions();
+      void fetchRegions(page, pageSize, searchQuery, sortBy, sortOrder);
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'Failed to delete region');
     }
@@ -320,7 +324,7 @@ export function RegionTable() {
       </div>
 
       <DataTable
-        data={regions}
+        data={regions || []}
         className={cn(
           "rounded-md border shadow-sm bg-white",
           isRTL && "font-arabic"

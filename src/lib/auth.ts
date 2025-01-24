@@ -89,7 +89,9 @@ export async function createUser(email: string, password: string, isAdmin: boole
       const permissions = [
         'create_user',
         'manage_roles',
-        'manage_permissions'
+        'manage_permissions',
+        'manage_regions',
+        'manage_donors'
       ];
       
       for (const permName of permissions) {
@@ -110,7 +112,9 @@ export async function createUser(email: string, password: string, isAdmin: boole
           create: [
             { permission: { connect: { name: 'create_user' } } },
             { permission: { connect: { name: 'manage_roles' } } },
-            { permission: { connect: { name: 'manage_permissions' } } }
+            { permission: { connect: { name: 'manage_permissions' } } },
+            { permission: { connect: { name: 'manage_regions' } } },
+            { permission: { connect: { name: 'manage_donors' } } }
           ]
         } : undefined
       },
@@ -145,6 +149,26 @@ export async function createUser(email: string, password: string, isAdmin: boole
                 }
               },
               create: { permission: { connect: { name: 'manage_permissions' } } },
+              update: {}
+            },
+            {
+              where: {
+                roleId_permissionId: {
+                  roleId: -1,
+                  permissionId: -1
+                }
+              },
+              create: { permission: { connect: { name: 'manage_regions' } } },
+              update: {}
+            },
+            {
+              where: {
+                roleId_permissionId: {
+                  roleId: -1,
+                  permissionId: -1
+                }
+              },
+              create: { permission: { connect: { name: 'manage_donors' } } },
               update: {}
             }
           ]
