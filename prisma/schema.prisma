@@ -80,6 +80,7 @@ model DonorCategory {
   updatedAt   DateTime @updatedAt
 
   @@map("donors_categories")
+  @@index([createdAt])
 }
 
 model Donor {
@@ -107,6 +108,10 @@ model Donor {
   @@map("donors")
   @@index([categoryId])
   @@index([regionId])
+  @@index([isPartner])
+  @@index([createdAt])
+  @@index([englishName(length: 191)])
+  @@index([arabicName(length: 191)])
 }
 
 enum Gender {
@@ -123,6 +128,8 @@ model Region {
   donors    Donor[]  @relation("RegionToDonors")
 
   @@map("regions")
+  @@index([name(length: 191)])
+  @@index([createdAt])
 }
 
 model Call {
@@ -145,4 +152,8 @@ model Call {
   @@map("calls")
   @@index([donorsId])
   @@index([insertUserId])
+  @@index([startDate])
+  @@index([endDate])
+  @@index([insertDate])
+  @@index([name(length: 191)])
 }
