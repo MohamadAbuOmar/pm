@@ -39,24 +39,30 @@ export function CategoryModal({ onSuccess }: CategoryModalProps) {
       setIsSubmitting(true);
       setError('');
 
+      // Clean up empty strings before submission
+      const cleanData = {
+        arabicName: data.arabicName?.trim() || undefined,
+        englishName: data.englishName?.trim() || undefined
+      };
+
       const res = await fetch('/api/admin/donors/categories', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(cleanData)
       });
 
       if (!res.ok) {
         const error = await res.json();
-        throw new Error(error.message || 'Failed to create category');
+        throw new Error(error.message || t('error.nameRequired'));
       }
 
       reset();
       setIsOpen(false);
       onSuccess();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create category');
+      setError(err instanceof Error ? err.message : t('error.nameRequired'));
     } finally {
       setIsSubmitting(false);
     }
@@ -88,8 +94,20 @@ export function CategoryModal({ onSuccess }: CategoryModalProps) {
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
+            <Alert 
+              variant="destructive"
+              className={cn(
+                "border-destructive/50 text-destructive dark:border-destructive",
+                "bg-destructive/5 shadow-sm",
+                isRTL && "font-arabic text-right"
+              )}
+            >
+              <AlertDescription className={cn(
+                "text-sm leading-relaxed",
+                isRTL && "font-arabic"
+              )}>
+                {error}
+              </AlertDescription>
             </Alert>
           )}
 

@@ -17,9 +17,15 @@ export const donorSchema = z.object({
 });
 
 export const donorCategorySchema = z.object({
-  arabicName: z.string().nullable(),
-  englishName: z.string().nullable()
-});
+  arabicName: z.string().optional(),
+  englishName: z.string().optional()
+}).refine(
+  data => Boolean(data.arabicName || data.englishName),
+  {
+    message: "At least one name must be provided in Arabic or English",
+    path: ["arabicName"] // Show error on arabicName field if both are empty
+  }
+);
 
 export type DonorInput = z.infer<typeof donorSchema>;
 export type DonorCategoryInput = z.infer<typeof donorCategorySchema>;

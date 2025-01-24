@@ -53,12 +53,15 @@ export function RegionForm({ region, onSuccess }: RegionFormProps) {
 
       if (!res.ok) {
         const error = await res.json();
-        throw new Error(error.message || 'Failed to save region');
+        if (res.status === 403) {
+          throw new Error(t('error.forbidden'));
+        }
+        throw new Error(error.message || t('error.failedToSave'));
       }
 
       onSuccess();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save region');
+      setError(err instanceof Error ? err.message : t('error.failedToSave'));
     } finally {
       setIsSubmitting(false);
     }
@@ -67,8 +70,20 @@ export function RegionForm({ region, onSuccess }: RegionFormProps) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {error && (
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
+        <Alert 
+          variant="destructive"
+          className={cn(
+            "border-destructive/50 text-destructive dark:border-destructive",
+            "bg-destructive/5 shadow-sm",
+            isRTL && "font-arabic text-right"
+          )}
+        >
+          <AlertDescription className={cn(
+            "text-sm leading-relaxed",
+            isRTL && "font-arabic"
+          )}>
+            {error}
+          </AlertDescription>
         </Alert>
       )}
 
