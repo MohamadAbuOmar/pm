@@ -16,13 +16,18 @@ export function AdminLayoutClient({ children, locale }: AdminLayoutClientProps) 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const t = useTranslations('admin.layout');
 
+  const isRTL = locale === 'ar';
+
   return (
-    <div className="min-h-screen flex" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+    <div 
+      className={`min-h-screen flex ${isRTL ? 'font-arabic' : 'font-sans'}`} 
+      dir={isRTL ? 'rtl' : 'ltr'}
+    >
       {/* Mobile Menu Button */}
       <Button
         variant="ghost"
         size="icon"
-        className="fixed top-4 left-4 z-50 md:hidden"
+        className={`fixed top-4 ${isRTL ? 'right-4' : 'left-4'} z-50 md:hidden`}
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
       >
         {isMobileMenuOpen ? (
@@ -35,15 +40,18 @@ export function AdminLayoutClient({ children, locale }: AdminLayoutClientProps) 
       {/* Sidebar Navigation */}
       <aside 
         className={`
-          fixed md:static inset-y-0 left-0 z-40
-          w-64 bg-gray-50 border-r transform transition-all duration-300 ease-in-out
-          ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+          fixed md:static inset-y-0 ${isRTL ? 'right-0 border-l' : 'left-0 border-r'} z-40
+          w-64 bg-gray-50 transform transition-all duration-300 ease-in-out
+          ${isMobileMenuOpen 
+            ? 'translate-x-0' 
+            : `${isRTL ? 'translate-x-full' : '-translate-x-full'} md:translate-x-0`
+          }
           md:shadow-none shadow-lg
         `}
       >
         <nav className="p-4 space-y-2 h-full overflow-y-auto">
           <div className="mb-8 flex items-center justify-between">
-            <h2 className="text-xl font-semibold">{t('title')}</h2>
+            <h2 className="text-xl font-semibold tracking-tight">{t('title')}</h2>
             <LanguageSwitcher />
           </div>
           <NavItems />
@@ -51,7 +59,10 @@ export function AdminLayoutClient({ children, locale }: AdminLayoutClientProps) 
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-4 md:p-8 md:ml-0 ml-0">
+      <main className={`
+        flex-1 p-4 md:p-8
+        ${isRTL ? 'md:mr-0 mr-0' : 'md:ml-0 ml-0'}
+      `}>
         <div className="md:hidden h-12" /> {/* Spacer for mobile menu button */}
         {children}
       </main>
