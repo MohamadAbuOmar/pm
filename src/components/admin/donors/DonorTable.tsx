@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/dialog';
 import { DonorForm } from './DonorForm';
 import { Plus, Search } from 'lucide-react';
-import { debounce } from 'lodash';
+import { debounce } from '@/lib/utils/debounce';
 
 interface Donor {
   id: number;

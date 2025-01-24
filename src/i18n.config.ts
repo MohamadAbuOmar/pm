@@ -10,8 +10,9 @@ export default getRequestConfig(async ({ locale }) => {
 
   try {
     return {
+      locale,
       messages: (await import(`@/messages/${locale}.json`)).default,
-      timeZone: 'Asia/Jerusalem',
+      timeZone: 'UTC',
       defaultTranslationValues: {
         strong: (chunks: string) => chunks,
         p: (chunks: string) => chunks,
@@ -27,8 +28,9 @@ export default getRequestConfig(async ({ locale }) => {
   } catch (error) {
     console.error(`Failed to load messages for locale ${locale}:`, error);
     return {
+      locale,
       messages: {},
-      timeZone: 'Asia/Jerusalem',
+      timeZone: 'UTC',
       defaultTranslationValues: {
         strong: (chunks: string) => chunks,
         p: (chunks: string) => chunks,
