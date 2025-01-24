@@ -16,7 +16,9 @@ const envSchema = z.object({
 
 // Parse and validate environment variables
 const env = envSchema.parse({
-  JWT_SECRET: process.env.JWT_SECRET,
+  JWT_SECRET: process.env.JWT_SECRET || (process.env.NODE_ENV === 'development' 
+    ? 'development_jwt_secret_at_least_32_chars_long'
+    : undefined),
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d',
   BCRYPT_SALT_ROUNDS: process.env.BCRYPT_SALT_ROUNDS || '10',
   DEFAULT_ROLE: process.env.DEFAULT_ROLE,
