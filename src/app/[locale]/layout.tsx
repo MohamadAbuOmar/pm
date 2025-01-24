@@ -17,8 +17,9 @@ interface Props {
 
 export default async function RootLayout({
   children,
-  params: { locale }
+  params
 }: Props) {
+  const locale = await params.locale;
   const messages = await getMessages();
 
   return (

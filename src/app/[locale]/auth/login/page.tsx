@@ -3,10 +3,11 @@ import { LoginForm } from '@/components/auth/login/LoginForm';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 export default async function LoginPage({
-  params: { locale }
+  params
 }: {
   params: { locale: string }
 }) {
+  const locale = await params.locale;
   const t = await getTranslations('auth.login');
 
   return (
