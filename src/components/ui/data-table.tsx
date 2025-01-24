@@ -21,18 +21,24 @@ export function DataTable<T>({ data, columns, className }: DataTableProps<T>) {
   return (
     <div className={cn('rounded-md border', className)}>
       <div className="w-full overflow-auto">
-        <table className="w-full caption-bottom text-sm">
+        <table className={cn(
+          "w-full caption-bottom text-sm",
+          isRTL && "font-arabic"
+        )}>
           <thead className={cn(
             'border-b bg-gray-50/80 transition-colors',
             isRTL && '[&_tr]:flex-row-reverse'
           )}>
-            <tr className="border-b transition-colors hover:bg-gray-50/50">
+            <tr className={cn(
+              "border-b transition-colors hover:bg-gray-50/50",
+              isRTL && "flex-row-reverse"
+            )}>
               {columns.map((column) => (
                 <th
                   key={column.key}
                   className={cn(
-                    'h-12 px-4 text-left align-middle font-medium text-gray-500',
-                    isRTL && 'text-right',
+                    'h-12 px-4 align-middle font-medium text-gray-500',
+                    isRTL ? 'text-right' : 'text-left',
                     column.className
                   )}
                 >
@@ -48,14 +54,17 @@ export function DataTable<T>({ data, columns, className }: DataTableProps<T>) {
             {data.map((row, i) => (
               <tr
                 key={i}
-                className="border-b transition-colors hover:bg-gray-50/50"
+                className={cn(
+                  "border-b transition-colors hover:bg-gray-50/50",
+                  isRTL && "flex-row-reverse"
+                )}
               >
                 {columns.map((column) => (
                   <td
                     key={column.key}
                     className={cn(
                       'p-4 align-middle',
-                      isRTL && 'text-right',
+                      isRTL ? 'text-right' : 'text-left',
                       column.className
                     )}
                   >

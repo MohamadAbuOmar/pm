@@ -74,28 +74,48 @@
         "calls": "إدارة المكالمات"
       }
     },
-    "filters": {
-      "search": "بحث...",
-      "from": "من",
-      "to": "إلى",
-      "startDate": "تاريخ البدء",
-      "endDate": "تاريخ الانتهاء",
-      "category": "الفئة",
-      "region": "المنطقة",
-      "partnerStatus": "حالة الشراكة"
-    },
-    "sort": {
-      "ascending": "تصاعدي",
-      "descending": "تنازلي",
-      "by": "ترتيب حسب"
+    "users": {
+      "title": "إدارة المستخدمين",
+      "registerUser": "تسجيل مستخدم جديد",
+      "assignRole": "تعيين دور للمستخدم",
+      "form": {
+        "fields": {
+          "email": "البريد الإلكتروني",
+          "password": "كلمة المرور",
+          "role": "الدور",
+          "permissions": "صلاحيات إضافية",
+          "user": "المستخدم"
+        },
+        "placeholders": {
+          "email": "أدخل البريد الإلكتروني",
+          "password": "أدخل كلمة المرور",
+          "selectRole": "اختر دوراً",
+          "selectUser": "اختر مستخدماً"
+        },
+        "buttons": {
+          "assign": "تعيين الدور",
+          "register": "تسجيل المستخدم"
+        },
+        "validation": {
+          "emailRequired": "البريد الإلكتروني مطلوب",
+          "emailInvalid": "البريد الإلكتروني غير صالح",
+          "passwordRequired": "كلمة المرور مطلوبة",
+          "passwordMinLength": "يجب أن تكون كلمة المرور 8 أحرف على الأقل",
+          "passwordUppercase": "يجب أن تحتوي كلمة المرور على حرف كبير واحد على الأقل",
+          "passwordLowercase": "يجب أن تحتوي كلمة المرور على حرف صغير واحد على الأقل",
+          "passwordNumber": "يجب أن تحتوي كلمة المرور على رقم واحد على الأقل",
+          "roleRequired": "الدور مطلوب",
+          "userRequired": "المستخدم مطلوب"
+        }
+      }
     },
     "regions": {
       "title": "إدارة المناطق",
+      "search": "بحث في المناطق...",
       "addNew": "إضافة منطقة جديدة",
       "addNewRegion": "إضافة منطقة جديدة",
       "editRegion": "تعديل المنطقة",
       "confirmDelete": "هل أنت متأكد من حذف هذه المنطقة؟",
-      "search": "بحث في المناطق...",
       "table": {
         "id": "الرقم",
         "name": "الاسم",
@@ -125,26 +145,30 @@
           "update": "حدث خطأ أثناء تحديث المنطقة",
           "delete": "حدث خطأ أثناء حذف المنطقة"
         }
+      },
+      "sort": {
+        "ascending": "تصاعدي",
+        "descending": "تنازلي"
       }
     },
     "calls": {
       "title": "إدارة المكالمات",
+      "search": "بحث في المكالمات...",
       "addNew": "إضافة مكالمة جديدة",
       "addNewCall": "إضافة مكالمة جديدة",
       "editCall": "تعديل المكالمة",
       "confirmDelete": "هل أنت متأكد من حذف هذه المكالمة؟",
-      "search": "بحث في المكالمات...",
       "table": {
         "id": "الرقم",
         "name": "الاسم",
         "focalPoint": "نقطة الاتصال",
         "budget": "الميزانية",
         "currency": "العملة",
-        "donorContribution": "مساهمة المانح",
+        "donorContribution": "مساهمة المتبرع",
         "uawcContribution": "مساهمة UAWC",
         "startDate": "تاريخ البدء",
         "endDate": "تاريخ الانتهاء",
-        "donor": "المانح",
+        "donor": "المتبرع",
         "createdBy": "أنشئ بواسطة",
         "actions": "الإجراءات",
         "createdAt": "تاريخ الإنشاء",
@@ -156,11 +180,11 @@
           "focalPoint": "نقطة الاتصال",
           "budget": "الميزانية",
           "currency": "العملة",
-          "donorContribution": "مساهمة المانح",
+          "donorContribution": "مساهمة المتبرع",
           "uawcContribution": "مساهمة UAWC",
           "startDate": "تاريخ البدء",
           "endDate": "تاريخ الانتهاء",
-          "donor": "المانح",
+          "donor": "المتبرع",
           "status": "الحالة"
         },
         "placeholders": {
@@ -168,16 +192,16 @@
           "focalPoint": "أدخل اسم نقطة الاتصال",
           "budget": "أدخل مبلغ الميزانية",
           "currency": "اختر العملة",
-          "donorContribution": "أدخل مساهمة المانح",
+          "donorContribution": "أدخل مساهمة المتبرع",
           "uawcContribution": "أدخل مساهمة UAWC",
           "startDate": "اختر تاريخ البدء",
           "endDate": "اختر تاريخ الانتهاء",
-          "donor": "اختر المانح",
+          "donor": "اختر المتبرع",
           "status": "اختر الحالة"
         },
         "validation": {
           "nameRequired": "اسم المكالمة مطلوب",
-          "donorRequired": "المانح مطلوب",
+          "donorRequired": "المتبرع مطلوب",
           "startDateRequired": "تاريخ البدء مطلوب",
           "endDateRequired": "تاريخ الانتهاء مطلوب",
           "budgetRequired": "الميزانية مطلوبة",
@@ -202,15 +226,19 @@
         "inProgress": "قيد التنفيذ",
         "completed": "مكتمل",
         "cancelled": "ملغي"
+      },
+      "sort": {
+        "ascending": "تصاعدي",
+        "descending": "تنازلي"
       }
     },
     "donors": {
       "title": "إدارة المتبرعين",
+      "search": "بحث في المتبرعين...",
       "addNew": "إضافة متبرع جديد",
       "addNewDonor": "إضافة متبرع جديد",
-      "editDonor": "تعديل متبرع",
+      "editDonor": "تعديل المتبرع",
       "confirmDelete": "هل أنت متأكد من حذف هذا المتبرع؟",
-      "search": "بحث في المتبرعين...",
       "table": {
         "id": "الرقم",
         "englishName": "الاسم بالإنجليزية",
@@ -238,8 +266,8 @@
           "website": "الموقع الإلكتروني",
           "workField": "مجال العمل",
           "gender": "الجنس",
-          "notes": "ملاحظات",
-          "region": "المنطقة"
+          "region": "المنطقة",
+          "notes": "ملاحظات"
         },
         "placeholders": {
           "englishName": "أدخل الاسم بالإنجليزية",
@@ -250,11 +278,33 @@
           "address": "أدخل العنوان",
           "website": "أدخل رابط الموقع الإلكتروني",
           "workField": "أدخل مجال العمل",
-          "notes": "أدخل الملاحظات"
+          "notes": "أدخل الملاحظات",
+          "category": "اختر الفئة",
+          "region": "اختر المنطقة",
+          "gender": "اختر الجنس"
         },
         "saving": "جاري الحفظ...",
         "update": "تحديث المتبرع",
-        "create": "إنشاء متبرع"
+        "create": "إنشاء متبرع",
+        "close": "إغلاق"
+      },
+      "filters": {
+        "allCategories": "جميع الفئات",
+        "allRegions": "جميع المناطق",
+        "allPartnerStatus": "جميع حالات الشراكة"
+      },
+      "sort": {
+        "ascending": "تصاعدي",
+        "descending": "تنازلي"
+      },
+      "gender": {
+        "male": "ذكر",
+        "female": "أنثى",
+        "other": "آخر"
+      },
+      "partnerStatus": {
+        "yes": "نعم",
+        "no": "لا"
       }
     }
   }

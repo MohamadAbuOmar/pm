@@ -1,6 +1,5 @@
 import { AdminLayoutClient } from '@/components/admin/layouts/AdminLayoutClient';
 import { ReactNode } from 'react';
-import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 
 interface Props {
@@ -10,17 +9,14 @@ interface Props {
 
 export default async function Layout({
   children,
-  params
+  params: { locale }
 }: Props) {
-  const locale = await params.locale;
-  const messages = await getMessages();
+  const messages = await getMessages(locale);
 
   return (
-    <NextIntlClientProvider locale={locale} messages={messages}>
-      <AdminLayoutClient locale={locale}>
-        {children}
-      </AdminLayoutClient>
-    </NextIntlClientProvider>
+    <AdminLayoutClient locale={locale}>
+      {children}
+    </AdminLayoutClient>
   );
 }
 
