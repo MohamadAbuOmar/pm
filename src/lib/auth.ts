@@ -91,7 +91,8 @@ export async function createUser(email: string, password: string, isAdmin: boole
         'manage_roles',
         'manage_permissions',
         'manage_regions',
-        'manage_donors'
+        'manage_donors',
+        'manage_calls'
       ];
       
       for (const permName of permissions) {
