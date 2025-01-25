@@ -136,8 +136,20 @@ export function DonorForm({ donor, onSuccess }: DonorFormProps) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 relative">
       {error && (
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
+        <Alert 
+          variant="destructive"
+          className={cn(
+            "border-destructive/50 text-destructive dark:border-destructive",
+            "bg-destructive/5 shadow-sm",
+            isRTL && "font-arabic text-right"
+          )}
+        >
+          <AlertDescription className={cn(
+            "text-sm leading-relaxed",
+            isRTL && "font-arabic"
+          )}>
+            {error}
+          </AlertDescription>
         </Alert>
       )}
 

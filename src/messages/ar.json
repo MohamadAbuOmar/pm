@@ -12,10 +12,17 @@
     "error": {
       "generic": "حدث خطأ",
       "unauthorized": "غير مصرح",
-      "forbidden": "محظور",
+      "forbidden": "ليس لديك صلاحية للقيام بهذا الإجراء",
       "invalidToken": "رمز غير صالح",
       "internalServer": "خطأ في الخادم",
-      "failedToFetch": "فشل في جلب البيانات"
+      "failedToFetch": "فشل في جلب البيانات",
+      "nameRequired": "يجب توفير اسم واحد على الأقل باللغة العربية أو الإنجليزية",
+      "failedToSave": "فشل في حفظ التغييرات",
+      "failedToCreate": "فشل في إنشاء العنصر",
+      "failedToUpdate": "فشل في تحديث العنصر",
+      "failedToDelete": "فشل في حذف العنصر",
+      "invalidInput": "يرجى التحقق من المدخلات والمحاولة مرة أخرى",
+      "missingPermission": "ليس لديك الصلاحيات المطلوبة"
     },
     "loading": "جاري التحميل...",
     "actions": {
@@ -79,6 +86,22 @@
         "calls": "إدارة المكالمات"
       }
     },
+    "roles": {
+      "title": "إدارة الأدوار",
+      "form": {
+        "fields": {
+          "name": "اسم الدور",
+          "permissions": "الصلاحيات"
+        },
+        "placeholders": {
+          "name": "أدخل اسم الدور"
+        },
+        "saving": "جاري الحفظ...",
+        "create": "إنشاء دور",
+        "assign": "تعيين دور",
+        "assigning": "جاري التعيين..."
+      }
+    },
     "users": {
       "title": "إدارة المستخدمين",
       "registerUser": "تسجيل مستخدم جديد",
@@ -101,6 +124,8 @@
           "assign": "تعيين الدور",
           "register": "تسجيل المستخدم"
         },
+        "assign": "تعيين دور",
+        "assigning": "جاري التعيين...",
         "validation": {
           "emailRequired": "البريد الإلكتروني مطلوب",
           "emailInvalid": "البريد الإلكتروني غير صالح",
@@ -176,6 +201,7 @@
         "donor": "المتبرع",
         "createdBy": "أنشئ بواسطة",
         "actions": "الإجراءات",
+        "insertDate": "تاريخ الإدخال",
         "createdAt": "تاريخ الإنشاء",
         "status": "الحالة"
       },

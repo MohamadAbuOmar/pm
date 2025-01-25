@@ -12,10 +12,17 @@
     "error": {
       "generic": "An error occurred",
       "unauthorized": "Unauthorized",
-      "forbidden": "Forbidden",
+      "forbidden": "You don't have permission to perform this action",
       "invalidToken": "Invalid token",
       "internalServer": "Internal server error",
-      "failedToFetch": "Failed to fetch data"
+      "failedToFetch": "Failed to fetch data",
+      "nameRequired": "At least one name must be provided in Arabic or English",
+      "failedToSave": "Failed to save changes",
+      "failedToCreate": "Failed to create item",
+      "failedToUpdate": "Failed to update item",
+      "failedToDelete": "Failed to delete item",
+      "invalidInput": "Please check your input and try again",
+      "missingPermission": "You don't have the required permissions"
     },
     "loading": "Loading...",
     "actions": {
@@ -79,6 +86,22 @@
         "calls": "Manage Calls"
       }
     },
+    "roles": {
+      "title": "Role Management",
+      "form": {
+        "fields": {
+          "name": "Role Name",
+          "permissions": "Permissions"
+        },
+        "placeholders": {
+          "name": "Enter role name"
+        },
+        "saving": "Saving...",
+        "create": "Create Role",
+        "assign": "Assign Role",
+        "assigning": "Assigning..."
+      }
+    },
     "users": {
       "title": "User Management",
       "registerUser": "Register New User",
@@ -101,6 +124,8 @@
           "assign": "Assign Role",
           "register": "Register User"
         },
+        "assign": "Assign Role",
+        "assigning": "Assigning...",
         "validation": {
           "emailRequired": "Email is required",
           "emailInvalid": "Invalid email address",
@@ -162,7 +187,8 @@
         "endDate": "End Date",
         "donor": "Donor",
         "createdBy": "Created By",
-        "actions": "Actions"
+        "actions": "Actions",
+        "insertDate": "Insert Date"
       },
       "form": {
         "fields": {
