@@ -22,8 +22,23 @@ async function setupAdmin() {
       'manage_permissions',
       'manage_donors',
       'manage_regions',
-      'manage_calls'
+      'manage_calls'  // Required for managing call operations
     ];
+    
+    console.log('Setting up permissions:', permissions);
+    
+    // First ensure all permissions exist
+    const createdPermissions = await Promise.all(
+      permissions.map(name =>
+        prisma.permission.upsert({
+          where: { name },
+          create: { name },
+          update: {}
+        })
+      )
+    );
+    
+    console.log('Permissions created/updated:', createdPermissions.map(p => p.name));
     
     // Create or update permissions
     for (const permName of permissions) {
@@ -49,15 +64,24 @@ async function setupAdmin() {
       },
       update: {
         permissions: {
-          deleteMany: {},
+          deleteMany: {}, // Remove all existing permissions
           create: permissions.map(name => ({
             permission: {
               connect: { name }
             }
           }))
         }
+      },
+      include: {
+        permissions: {
+          include: {
+            permission: true
+          }
+        }
       }
     });
+
+    console.log('Admin role permissions:', role.permissions.map(p => p.permission.name));
 
     // Find existing admin user or create new one
     const existingUser = await prisma.user.findUnique({
@@ -65,6 +89,33 @@ async function setupAdmin() {
     });
 
     if (existingUser) {
+      console.log('Found existing admin user:', { id: existingUser.id, email: existingUser.email });
+      
+      // Get current user roles and permissions
+      const currentUser = await prisma.user.findUnique({
+        where: { id: existingUser.id },
+        include: {
+          roles: {
+            include: {
+              role: {
+                include: {
+                  permissions: {
+                    include: {
+                      permission: true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      });
+
+      console.log('Current user roles:', currentUser.roles.map(ur => ur.role.name));
+      console.log('Current permissions:', currentUser.roles.flatMap(ur => 
+        ur.role.permissions.map(rp => rp.permission.name)
+      ));
+
       // Update existing user's roles
       await prisma.userRole.deleteMany({
         where: { userId: existingUser.id }
@@ -76,6 +127,31 @@ async function setupAdmin() {
           role: { connect: { id: role.id } }
         }
       });
+
+      // Verify updated permissions
+      const updatedUser = await prisma.user.findUnique({
+        where: { id: existingUser.id },
+        include: {
+          roles: {
+            include: {
+              role: {
+                include: {
+                  permissions: {
+                    include: {
+                      permission: true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      });
+
+      console.log('Updated user roles:', updatedUser.roles.map(ur => ur.role.name));
+      console.log('Updated permissions:', updatedUser.roles.flatMap(ur => 
+        ur.role.permissions.map(rp => rp.permission.name)
+      ));
 
       console.log('Admin user updated successfully:', { id: existingUser.id, email: existingUser.email });
     } else {
