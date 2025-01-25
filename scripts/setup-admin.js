@@ -6,7 +6,11 @@ const prisma = new PrismaClient();
 async function setupAdmin() {
   try {
     const email = 'admin@example.com';
-    const password = 'Admin123!';
+    // NOTE: This is the development password. In production:
+    // 1. Use environment variables for sensitive data
+    // 2. Change this password immediately after first login
+    // 3. Follow security best practices for password management
+    const password = process.env.ADMIN_PASSWORD || 'Admin123!';
     const saltRounds = 10;
     
     console.log('Setting up admin user and permissions...');
